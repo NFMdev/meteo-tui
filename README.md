@@ -1,2 +1,2 @@
-# arch-weather-cli
-Arch Weather CLI is a CLI weather Go application for Arch Linux.
+# Meteo TUI
+Meteo TUI is a Go-based TUI weather application for Arch Linux.
