@@ -3,11 +3,14 @@ package main
 import (
 	"flag"
 	"fmt"
+	"net/http"
 	"os"
+	"time"
 
 	tea "charm.land/bubbletea/v2"
 
 	"github.com/nfmdev/meteo/internal/app"
+	"github.com/nfmdev/meteo/internal/location"
 	"github.com/nfmdev/meteo/internal/tui"
 )
 
@@ -28,11 +31,17 @@ func main() {
 		os.Exit(1)
 	}
 
+	httpClient := &http.Client{
+		Timeout: 10 * time.Second,
+	}
+
+	locationResolver := location.NewOpenMeteoResolver(httpClient)
+
 	var weatherService app.WeatherService
 	if *fail {
-		weatherService = app.NewFailingWeatherService()
+		weatherService = app.NewFailingWeatherService(locationResolver)
 	} else {
-		weatherService = app.NewFakeWeatherService()
+		weatherService = app.NewFakeWeatherService(locationResolver)
 	}
 
 	model := tui.NewModel(*city, *country, weatherService)

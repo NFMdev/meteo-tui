@@ -15,16 +15,20 @@ type WeatherService interface {
 }
 
 type FakeWeatherService struct {
-	shouldFail bool
+	locationResolver LocationResolver
+	shouldFail       bool
 }
 
-func NewFakeWeatherService() FakeWeatherService {
-	return FakeWeatherService{}
-}
-
-func NewFailingWeatherService() FakeWeatherService {
+func NewFakeWeatherService(locationResolver LocationResolver) FakeWeatherService {
 	return FakeWeatherService{
-		shouldFail: true,
+		locationResolver: locationResolver,
+	}
+}
+
+func NewFailingWeatherService(locationResolver LocationResolver) FakeWeatherService {
+	return FakeWeatherService{
+		locationResolver: locationResolver,
+		shouldFail:       true,
 	}
 }
 
@@ -45,11 +49,9 @@ func (s FakeWeatherService) GetWeather(
 
 	now := time.Now()
 
-	location := domain.Location{
-		City:      city,
-		Country:   country,
-		Latitude:  57.048,
-		Longitude: 9.9187,
+	location, err := s.locationResolver.Resolve(ctx, city, country)
+	if err != nil {
+		return domain.WeatherReport{}, err
 	}
 
 	daily := []domain.DailyForecast{

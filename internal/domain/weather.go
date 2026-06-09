@@ -7,6 +7,7 @@ type Location struct {
 	Country   string
 	Latitude  float64
 	Longitude float64
+	Timezone  string
 }
 
 type WeatherReport struct {
