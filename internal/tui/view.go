@@ -3,8 +3,10 @@ package tui
 import (
 	"fmt"
 	"strings"
+	"time"
 
 	tea "charm.land/bubbletea/v2"
+	"github.com/nfmdev/meteo/internal/domain"
 )
 
 func (m Model) View() tea.View {
@@ -17,7 +19,7 @@ func (m Model) render() string {
 	metrics := m.renderMetrics()
 	daily := m.renderDailyForecast()
 	hourly := m.renderHourlyForecast()
-	footer := footerStyle.Render("q quit | ctrl+c quit")
+	help := footerStyle.Render(m.help.View(m.keys))
 
 	return appStyle.Render(strings.Join([]string{
 		header,
@@ -30,7 +32,7 @@ func (m Model) render() string {
 		"",
 		hourly,
 		"",
-		footer,
+		help,
 	}, "\n"))
 }
 
@@ -42,7 +44,7 @@ func (m Model) renderHeader() string {
 	)
 
 	updatedAt := subtitleStyle.Render(
-		fmt.Sprintf("Updated: %s", m.report.UpdatedAt.Format("15:04")),
+		fmt.Sprintf("Updated: %s", m.report.UpdatedAt.Format("15:04:05")),
 	)
 
 	return strings.Join([]string{
@@ -87,11 +89,17 @@ func (m Model) renderDailyForecast() string {
 		"",
 	}
 
-	for _, day := range m.report.Daily {
+	for index, day := range m.report.Daily {
+		cursor := " "
+		if index == m.selectedDay {
+			cursor = ">"
+		}
+
 		lines = append(
 			lines,
 			fmt.Sprintf(
-				"%s\t%.1f°C / %.1f°C\t%s\train %.1f mm",
+				"%s\t%s\t%.1f°C / %.1f°C\t%s\train %.1f mm",
+				cursor,
 				day.Date.Format("Mon 02 Jun"),
 				day.MaxTemperatureC,
 				day.MinTemperatureC,
@@ -105,12 +113,24 @@ func (m Model) renderDailyForecast() string {
 }
 
 func (m Model) renderHourlyForecast() string {
+	selectedDay, ok := m.selectedDailyForecast()
+	if !ok {
+		return panelStyle.Render("Hourly Forecast\n\nNo selected day.")
+	}
+
+	hours := m.hourlyForecastForSelectedDay()
+
 	lines := []string{
-		"Hourly Forecast",
+		fmt.Sprintf("Hourly Forecast — %s", selectedDay.Date.Format("Mon 02 Jun")),
 		"",
 	}
 
-	for _, hour := range m.report.Hourly {
+	if len(hours) == 0 {
+		lines = append(lines, "No hourly forecast avaliable for this day.")
+		return panelStyle.Render(strings.Join(lines, "\n"))
+	}
+
+	for _, hour := range hours {
 		lines = append(
 			lines,
 			fmt.Sprintf("%s\t%.1f°C\tfeels %.1f°C\t%s\twind %.1f km/h",
@@ -124,4 +144,36 @@ func (m Model) renderHourlyForecast() string {
 	}
 
 	return panelStyle.Render(strings.Join(lines, "\n"))
+}
+
+func (m Model) selectedDailyForecast() (domain.DailyForecast, bool) {
+	if m.selectedDay < 0 || m.selectedDay >= len(m.report.Daily) {
+		return domain.DailyForecast{}, false
+	}
+
+	return m.report.Daily[m.selectedDay], true
+}
+
+func (m Model) hourlyForecastForSelectedDay() []domain.HourlyForecast {
+	selectedDay, ok := m.selectedDailyForecast()
+	if !ok {
+		return nil
+	}
+
+	hours := make([]domain.HourlyForecast, 0)
+
+	for _, hour := range m.report.Hourly {
+		if sameDay(hour.Time, selectedDay.Date) {
+			hours = append(hours, hour)
+		}
+	}
+
+	return hours
+}
+
+func sameDay(a time.Time, b time.Time) bool {
+	aYear, aMonth, aDay := a.Date()
+	bYear, bMonth, bDay := b.Date()
+
+	return aYear == bYear && aMonth == bMonth && aDay == bDay
 }

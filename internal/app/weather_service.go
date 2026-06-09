@@ -57,44 +57,22 @@ func (s FakeWeatherService) GetWeather(
 			Condition:       "Windy",
 			WeatherCode:     3,
 			PrecipitationMM: 0.0,
-			MaxWindKmh:      47.0,
+			MaxWindKmh:      39.0,
 		},
 	}
 
 	hourly := []domain.HourlyForecast{
-		{
-			Time:              beginningOfDay(now).Add(8 * time.Hour),
-			TemperatureC:      15.8,
-			FeelsLikeC:        11.2,
-			Condition:         "Cloudy",
-			WeatherCode:       3,
-			HumidityPercent:   84,
-			PrecipitationMM:   0.1,
-			CloudCoverPercent: 92,
-			WindSpeedKmh:      21.0,
-		},
-		{
-			Time:              beginningOfDay(now).Add(9 * time.Hour),
-			TemperatureC:      16.5,
-			FeelsLikeC:        12.5,
-			Condition:         "Cloudy",
-			WeatherCode:       3,
-			HumidityPercent:   82,
-			PrecipitationMM:   0.1,
-			CloudCoverPercent: 99,
-			WindSpeedKmh:      22.5,
-		},
-		{
-			Time:              beginningOfDay(now).Add(10 * time.Hour),
-			TemperatureC:      17.8,
-			FeelsLikeC:        14.2,
-			Condition:         "Overcast",
-			WeatherCode:       3,
-			HumidityPercent:   80,
-			PrecipitationMM:   0.2,
-			CloudCoverPercent: 95,
-			WindSpeedKmh:      24.0,
-		},
+		fakeHour(now, 0, 8, 15.8, 12.2, "Cloudy", 84, 0.1, 92, 21.0),
+		fakeHour(now, 0, 9, 16.3, 13.8, "Cloudy", 82, 0.1, 90, 22.5),
+		fakeHour(now, 0, 10, 18.1, 15.4, "Overcast", 80, 0.2, 95, 24.0),
+
+		fakeHour(now, 1, 8, 15.9, 12.3, "Light rain", 88, 0.6, 98, 25.0),
+		fakeHour(now, 1, 9, 16.4, 12.8, "Light rain", 87, 0.7, 99, 27.0),
+		fakeHour(now, 1, 10, 17.0, 13.3, "Rain", 89, 0.8, 100, 28.5),
+
+		fakeHour(now, 2, 8, 13.8, 10.5, "Windy", 76, 0.0, 70, 32.0),
+		fakeHour(now, 2, 9, 14.6, 10.4, "Windy", 74, 0.0, 65, 34.0),
+		fakeHour(now, 2, 10, 15.5, 11.2, "Partly cloudy", 72, 0.0, 55, 35.0),
 	}
 
 	return domain.WeatherReport{
@@ -125,4 +103,29 @@ func beginningOfDay(t time.Time) time.Time {
 	year, month, day := t.Date()
 
 	return time.Date(year, month, day, 0, 0, 0, 0, t.Location())
+}
+
+func fakeHour(
+	now time.Time,
+	dayOffset int,
+	hour int,
+	temperatureC float64,
+	feelsLikeC float64,
+	condition string,
+	humidityPercent int,
+	precipitationMM float64,
+	cloudCoverPercent int,
+	windSpeedKmh float64,
+) domain.HourlyForecast {
+	return domain.HourlyForecast{
+		Time:              beginningOfDay(now.AddDate(0, 0, dayOffset)).Add(time.Duration(hour) * time.Hour),
+		TemperatureC:      temperatureC,
+		FeelsLikeC:        feelsLikeC,
+		Condition:         condition,
+		WeatherCode:       3,
+		HumidityPercent:   humidityPercent,
+		PrecipitationMM:   precipitationMM,
+		CloudCoverPercent: cloudCoverPercent,
+		WindSpeedKmh:      windSpeedKmh,
+	}
 }
