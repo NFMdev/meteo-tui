@@ -1,16 +1,16 @@
 package tui
 
+import "github.com/nfmdev/meteo/internal/domain"
+
 type Model struct {
-	city    string
-	country string
+	report domain.WeatherReport
 
 	width  int
 	height int
 }
 
-func NewModel(city string, country string) Model {
+func NewModel(report domain.WeatherReport) Model {
 	return Model{
-		city:    city,
-		country: country,
+		report: report,
 	}
 }

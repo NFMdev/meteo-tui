@@ -1,12 +1,14 @@
 package main
 
 import (
+	"context"
 	"flag"
 	"fmt"
 	"os"
 
 	tea "charm.land/bubbletea/v2"
 
+	"github.com/nfmdev/meteo/internal/app"
 	"github.com/nfmdev/meteo/internal/tui"
 )
 
@@ -26,7 +28,15 @@ func main() {
 		os.Exit(1)
 	}
 
-	model := tui.NewModel(*city, *country)
+	weatherService := app.NewFakeWeatherService()
+
+	report, err := weatherService.GetWeather(context.Background(), *city, *country)
+	if err != nil {
+		fmt.Fprintf(os.Stderr, "meteo: failed to load weather data: %v\n", err)
+		os.Exit(1)
+	}
+
+	model := tui.NewModel(report)
 
 	program := tea.NewProgram(model)
 
