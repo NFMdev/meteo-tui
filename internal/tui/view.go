@@ -14,6 +14,65 @@ func (m Model) View() tea.View {
 }
 
 func (m Model) render() string {
+	switch {
+	case m.loading:
+		return m.renderLoading()
+
+	case m.err != nil:
+		return m.renderError()
+
+	default:
+		return m.renderDashboard()
+	}
+}
+
+func (m Model) renderLoading() string {
+	title := titleStyle.Render(
+		fmt.Sprintf("Meteo — %s, %s", m.city, m.country),
+	)
+
+	content := panelStyle.Render(strings.Join([]string{
+		fmt.Sprintf("%s Loading weather data...", m.spinner.View()),
+		"",
+		"Fetching forecast information.",
+	}, "\n"))
+
+	help := footerStyle.Render(m.help.View(m.keys))
+
+	return appStyle.Render(strings.Join([]string{
+		title,
+		"",
+		content,
+		"",
+		help,
+	}, "\n"))
+}
+
+func (m Model) renderError() string {
+	title := titleStyle.Render(
+		fmt.Sprintf("Meteo — %s, %s", m.city, m.country),
+	)
+
+	content := errorStyle.Render(panelStyle.Render(strings.Join([]string{
+		"Could not load weather data.",
+		"",
+		fmt.Sprintf("Error: %v", m.err),
+		"",
+		"Press r to retry.",
+	}, "\n")))
+
+	help := footerStyle.Render(m.help.View(m.keys))
+
+	return appStyle.Render(strings.Join([]string{
+		title,
+		"",
+		content,
+		"",
+		help,
+	}, "\n"))
+}
+
+func (m Model) renderDashboard() string {
 	header := m.renderHeader()
 	current := m.renderCurrentWeather()
 	metrics := m.renderMetrics()
@@ -37,10 +96,8 @@ func (m Model) render() string {
 }
 
 func (m Model) renderHeader() string {
-	location := m.report.Location
-
 	title := titleStyle.Render(
-		fmt.Sprintf("Meteo — %s, %s", location.City, location.Country),
+		fmt.Sprintf("Meteo — %s, %s", m.city, m.country),
 	)
 
 	updatedAt := subtitleStyle.Render(

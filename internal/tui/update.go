@@ -1,14 +1,19 @@
 package tui
 
 import (
+	"context"
 	"time"
 
 	"charm.land/bubbles/v2/key"
+	"charm.land/bubbles/v2/spinner"
 	tea "charm.land/bubbletea/v2"
 )
 
 func (m Model) Init() tea.Cmd {
-	return nil
+	return tea.Batch(
+		m.spinner.Tick,
+		m.loadWeatherCmd(),
+	)
 }
 
 func (m Model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
@@ -29,16 +34,52 @@ func (m Model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 			m.help.ShowAll = m.showHelp
 
 		case key.Matches(msg, m.keys.Refresh):
-			// Temp fake refresh for Block 3.
-			// In Block 4 will become an async bubbletea command.
-			m.report.UpdatedAt = time.Now()
+			m.loading = true
+			m.err = nil
+			m.selectedDay = 0
+
+			return m, tea.Batch(
+				m.spinner.Tick,
+				m.loadWeatherCmd(),
+			)
 		}
+	case spinner.TickMsg:
+		if m.loading {
+			var cmd tea.Cmd
+			m.spinner, cmd = m.spinner.Update(msg)
+			return m, cmd
+		}
+
+	case weatherLoadedMsg:
+		m.loading = false
+		m.err = nil
+		m.report = msg.report
+		m.selectedDay = 0
+
+	case weatherFailedMsg:
+		m.loading = false
+		m.err = msg.err
+
 	case tea.WindowSizeMsg:
 		m.width = msg.Width
 		m.height = msg.Height
 		m.help.SetWidth(msg.Width)
 	}
 	return m, nil
+}
+
+func (m Model) loadWeatherCmd() tea.Cmd {
+	return func() tea.Msg {
+		ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
+		defer cancel()
+
+		report, err := m.loader.GetWeather(ctx, m.city, m.country)
+		if err != nil {
+			return weatherFailedMsg{err: err}
+		}
+
+		return weatherLoadedMsg{report: report}
+	}
 }
 
 func (m *Model) selectPreviousDay() {

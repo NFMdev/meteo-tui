@@ -13,6 +13,8 @@ var (
 			Border(lipgloss.RoundedBorder()).
 			Padding(1, 2)
 
+	errorStyle = lipgloss.NewStyle().Bold(true)
+
 	footerStyle = lipgloss.NewStyle().
 			Faint(true)
 )

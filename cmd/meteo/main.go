@@ -1,7 +1,6 @@
 package main
 
 import (
-	"context"
 	"flag"
 	"fmt"
 	"os"
@@ -15,6 +14,7 @@ import (
 func main() {
 	city := flag.String("city", "Copenhagen", "city name")
 	country := flag.String("country", "DK", "ISO 31166-1 alpha-2 country code")
+	fail := flag.Bool("fail", false, "simulate weather loading failure")
 
 	flag.Parse()
 
@@ -28,15 +28,14 @@ func main() {
 		os.Exit(1)
 	}
 
-	weatherService := app.NewFakeWeatherService()
-
-	report, err := weatherService.GetWeather(context.Background(), *city, *country)
-	if err != nil {
-		fmt.Fprintf(os.Stderr, "meteo: failed to load weather data: %v\n", err)
-		os.Exit(1)
+	var weatherService app.WeatherService
+	if *fail {
+		weatherService = app.NewFailingWeatherService()
+	} else {
+		weatherService = app.NewFakeWeatherService()
 	}
 
-	model := tui.NewModel(report)
+	model := tui.NewModel(*city, *country, weatherService)
 
 	program := tea.NewProgram(model)
 

@@ -2,19 +2,30 @@ package app
 
 import (
 	"context"
+	"errors"
 	"time"
 
 	"github.com/nfmdev/meteo/internal/domain"
 )
 
+var ErrWeatherUnavailable = errors.New("weather data is currently unavailable")
+
 type WeatherService interface {
 	GetWeather(ctx context.Context, city string, country string) (domain.WeatherReport, error)
 }
 
-type FakeWeatherService struct{}
+type FakeWeatherService struct {
+	shouldFail bool
+}
 
 func NewFakeWeatherService() FakeWeatherService {
 	return FakeWeatherService{}
+}
+
+func NewFailingWeatherService() FakeWeatherService {
+	return FakeWeatherService{
+		shouldFail: true,
+	}
 }
 
 func (s FakeWeatherService) GetWeather(
@@ -22,6 +33,16 @@ func (s FakeWeatherService) GetWeather(
 	city string,
 	country string,
 ) (domain.WeatherReport, error) {
+	select {
+	case <-time.After(350 * time.Millisecond):
+	case <-ctx.Done():
+		return domain.WeatherReport{}, ctx.Err()
+	}
+
+	if s.shouldFail {
+		return domain.WeatherReport{}, ErrWeatherUnavailable
+	}
+
 	now := time.Now()
 
 	location := domain.Location{
