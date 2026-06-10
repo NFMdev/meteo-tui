@@ -12,6 +12,7 @@ import (
 	"github.com/nfmdev/meteo/internal/app"
 	"github.com/nfmdev/meteo/internal/location"
 	"github.com/nfmdev/meteo/internal/tui"
+	"github.com/nfmdev/meteo/internal/weather/openmeteo"
 )
 
 func main() {
@@ -36,12 +37,13 @@ func main() {
 	}
 
 	locationResolver := location.NewOpenMeteoResolver(httpClient)
+	forecastClient := openmeteo.NewClient(httpClient)
 
 	var weatherService app.WeatherService
 	if *fail {
 		weatherService = app.NewFailingWeatherService(locationResolver)
 	} else {
-		weatherService = app.NewFakeWeatherService(locationResolver)
+		weatherService = app.NewWeatherService(locationResolver, forecastClient)
 	}
 
 	model := tui.NewModel(*city, *country, weatherService)

@@ -11,7 +11,6 @@ import (
 	"github.com/nfmdev/meteo/internal/domain"
 )
 
-/*										  https://geocoding-api.open-meteo.com/v1/search?name=Berlin&count=10&language=en&format=json*/
 const defaultOpenMeteoGeocodingBaseURL = "https://geocoding-api.open-meteo.com/v1/search"
 
 type OpenMeteoResolver struct {

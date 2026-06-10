@@ -14,9 +14,26 @@ type WeatherService interface {
 	GetWeather(ctx context.Context, city string, country string) (domain.WeatherReport, error)
 }
 
+type RealWeatherService struct {
+	locationResolver LocationResolver
+	forecastProvider ForecastProvider
+}
+
+// TODO: remove fake weather service before releasing v1.0
+// Keeping it for development testing
 type FakeWeatherService struct {
 	locationResolver LocationResolver
 	shouldFail       bool
+}
+
+func NewWeatherService(
+	locationResolver LocationResolver,
+	forecastProvider ForecastProvider,
+) RealWeatherService {
+	return RealWeatherService{
+		locationResolver: locationResolver,
+		forecastProvider: forecastProvider,
+	}
 }
 
 func NewFakeWeatherService(locationResolver LocationResolver) FakeWeatherService {
@@ -30,6 +47,24 @@ func NewFailingWeatherService(locationResolver LocationResolver) FakeWeatherServ
 		locationResolver: locationResolver,
 		shouldFail:       true,
 	}
+}
+
+func (s RealWeatherService) GetWeather(
+	ctx context.Context,
+	city string,
+	country string,
+) (domain.WeatherReport, error) {
+	location, err := s.locationResolver.Resolve(ctx, city, country)
+	if err != nil {
+		return domain.WeatherReport{}, err
+	}
+
+	report, err := s.forecastProvider.GetForecast(ctx, location)
+	if err != nil {
+		return domain.WeatherReport{}, err
+	}
+
+	return report, nil
 }
 
 func (s FakeWeatherService) GetWeather(
