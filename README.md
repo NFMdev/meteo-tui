@@ -1,10 +1,21 @@
 # Meteo TUI
 
-A terminal weather dashboard built with Go + Bubble Tea.
+Meteo TUI is an interactive terminal weather dashboard built in Go for Linux terminal environments.
+
+The project currently uses Open-Meteo for geocoding and forecast data.
 
 ## Current status
 
-v0.1.0 provides a functional interactive TUI with weather data from Open-Meteo.
+Version: `v0.2.0`
+
+Meteo TUI currently supports:
+- real location resolution from city and country code
+- real weather forecast data from Open-Meteo
+- current weather panel
+- weather metrics panel
+- daily forecast list
+- hourly forecast for the selected day
+- keyboard navigation
 
 ## Run
 
@@ -12,9 +23,28 @@ v0.1.0 provides a functional interactive TUI with weather data from Open-Meteo.
 go run ./cmd/meteo --city Copenhagen --country DK
 ```
 
+You can also try another city:
+```bash
+go run ./cmd/meteo --city Copenhagen --country DK
+```
+
 ## Controls
- - q / ctrl+c: quit
- - r: refresh
- - ↑ / k: previous day
- - ↓ / j: next day
- - ?: toggle help
+| Key | Action |
+| :---: | :---: |
+| q / ctrl+c | quit |
+| r | refresh |
+| ↑ / k | previous day |
+| ↓ / j | next day |
+| ? | toggle help |
+
+## Requirements
+- Go
+- Internet connection
+- Terminal with enough size for the TUI
+
+## Built With
+- Go
+- Bubble Tea
+- Bubbles
+- Lip Gloss
+- Open-Meteo
