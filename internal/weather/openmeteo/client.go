@@ -16,7 +16,7 @@ const defaultForecastBaseURL = "https://api.open-meteo.com/v1/forecast"
 
 type Client struct {
 	client  *http.Client
-	baseUrl string
+	baseURL string
 }
 
 func NewClient(client *http.Client) Client {
@@ -26,7 +26,7 @@ func NewClient(client *http.Client) Client {
 
 	return Client{
 		client:  client,
-		baseUrl: defaultForecastBaseURL,
+		baseURL: defaultForecastBaseURL,
 	}
 }
 
@@ -34,7 +34,7 @@ func (c Client) GetForecast(
 	ctx context.Context,
 	location domain.Location,
 ) (domain.WeatherReport, error) {
-	requestURL, err := buildForecastURL(c.baseUrl, location)
+	requestURL, err := buildForecastURL(c.baseURL, location)
 	if err != nil {
 		return domain.WeatherReport{}, fmt.Errorf("build forecast URL: %w", err)
 	}
