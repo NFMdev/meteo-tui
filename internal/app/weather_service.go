@@ -130,7 +130,7 @@ func (s FakeWeatherService) GetWeather(
 
 		fakeHour(now, 2, 8, 13.8, 10.5, "Windy", 76, 0.0, 70, 32.0),
 		fakeHour(now, 2, 9, 14.6, 10.4, "Windy", 74, 0.0, 65, 34.0),
-		fakeHour(now, 2, 10, 15.5, 11.2, "Partly cloudy", 72, 0.0, 55, 35.0),
+		fakeHour(now, 2, 10, 15.5, 11.2, "Partly Cloudy", 72, 0.0, 55, 35.0),
 	}
 
 	return domain.WeatherReport{
