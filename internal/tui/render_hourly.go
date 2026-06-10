@@ -2,13 +2,14 @@ package tui
 
 import (
 	"fmt"
-	"strings"
 )
 
 func (m Model) renderHourlyForecast() string {
 	selectedDay, ok := m.selectedDailyForecast()
 	if !ok {
-		return panelStyle.Render("Hourly Forecast\n\nNo selected day.")
+		return panelStyle.
+			Width(m.panelWidth()).
+			Render("Hourly Forecast\n\nNo selected day.")
 	}
 
 	hours := m.hourlyForecastForSelectedDay()
@@ -20,7 +21,10 @@ func (m Model) renderHourlyForecast() string {
 
 	if len(hours) == 0 {
 		lines = append(lines, "No hourly forecast avaliable for this day.")
-		return panelStyle.Render(strings.Join(lines, "\n"))
+
+		return panelStyle.
+			Width(m.panelWidth()).
+			Render(joinTruncatedLines(lines, m.innerPanelWidth()))
 	}
 
 	for _, hour := range hours {
@@ -36,5 +40,7 @@ func (m Model) renderHourlyForecast() string {
 		)
 	}
 
-	return panelStyle.Render(strings.Join(lines, "\n"))
+	return panelStyle.
+		Width(m.panelWidth()).
+		Render(joinTruncatedLines(lines, m.innerPanelWidth()))
 }

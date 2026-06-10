@@ -2,7 +2,6 @@ package tui
 
 import (
 	"fmt"
-	"strings"
 )
 
 func (m Model) renderDailyForecast() string {
@@ -31,5 +30,7 @@ func (m Model) renderDailyForecast() string {
 		)
 	}
 
-	return panelStyle.Render(strings.Join(lines, "\n"))
+	return panelStyle.
+		Width(m.panelWidth()).
+		Render(joinTruncatedLines(lines, m.innerPanelWidth()))
 }

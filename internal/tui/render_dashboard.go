@@ -8,7 +8,7 @@ func (m Model) renderDashboard() string {
 	metrics := m.renderMetrics()
 	daily := m.renderDailyForecast()
 	hourly := m.renderHourlyForecast()
-	help := footerStyle.Render(m.help.View(m.keys))
+	help := footerStyle.Render(truncateText(m.help.View(m.keys), m.contentWidth()))
 
 	return appStyle.Render(strings.Join([]string{
 		header,

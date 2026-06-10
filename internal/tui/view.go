@@ -7,6 +7,10 @@ func (m Model) View() tea.View {
 }
 
 func (m Model) render() string {
+	if m.isTerminalTooSmall() {
+		return m.renderSmallTerminal()
+	}
+
 	switch {
 	case m.loading:
 		return m.renderLoading()

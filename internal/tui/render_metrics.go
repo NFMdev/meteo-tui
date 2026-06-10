@@ -1,14 +1,11 @@
 package tui
 
-import (
-	"fmt"
-	"strings"
-)
+import "fmt"
 
 func (m Model) renderMetrics() string {
 	metrics := m.report.Metrics
 
-	content := strings.Join([]string{
+	lines := []string{
 		"Metrics",
 		"",
 		fmt.Sprintf("Humidity:\t%d%%", metrics.HumidityPercent),
@@ -16,7 +13,9 @@ func (m Model) renderMetrics() string {
 		fmt.Sprintf("Pecipitation:\t%.1f mm", metrics.PrecipitationMM),
 		fmt.Sprintf("Cloud cover:\t%d%%", metrics.CloudCoverPercent),
 		fmt.Sprintf("Wind:\t\t%.1f Km/h", metrics.WindSpeedKmh),
-	}, "\n")
+	}
 
-	return panelStyle.Render(content)
+	return panelStyle.
+		Width(m.panelWidth()).
+		Render(joinTruncatedLines(lines, m.innerPanelWidth()))
 }

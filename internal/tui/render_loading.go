@@ -7,16 +7,20 @@ import (
 
 func (m Model) renderLoading() string {
 	title := titleStyle.Render(
-		fmt.Sprintf("Meteo — %s, %s", m.city, m.country),
+		truncateText(fmt.Sprintf("Meteo — %s, %s", m.city, m.country), m.contentWidth()),
 	)
 
-	content := panelStyle.Render(strings.Join([]string{
+	lines := []string{
 		fmt.Sprintf("%s Loading weather data...", m.spinner.View()),
 		"",
 		"Fetching forecast information.",
-	}, "\n"))
+	}
 
-	help := footerStyle.Render(m.help.View(m.keys))
+	content := panelStyle.
+		Width(m.panelWidth()).
+		Render(joinTruncatedLines(lines, m.innerPanelWidth()))
+
+	help := footerStyle.Render(truncateText(m.help.View(m.keys), m.contentWidth()))
 
 	return appStyle.Render(strings.Join([]string{
 		title,
