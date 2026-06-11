@@ -20,7 +20,7 @@ func (m Model) dashboardLayout() dashboardLayout {
 	contentWidth := m.contentWidth()
 	contentHeight := m.dashboardContentHeight()
 
-	leftWidth := contentWidth * 40 / 100
+	leftWidth := contentWidth * 45 / 100
 	rightWidth := contentWidth - leftWidth - gap
 
 	if leftWidth < 30 {

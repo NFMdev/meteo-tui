@@ -25,9 +25,11 @@ func (m Model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 
 		case key.Matches(msg, m.keys.Up):
 			m.selectPreviousDay()
+			m.rebuildViewportContent()
 
 		case key.Matches(msg, m.keys.Down):
 			m.selectNextDay()
+			m.rebuildViewportContent()
 
 		case key.Matches(msg, m.keys.ScrollUp):
 			if m.layoutMode() == layoutModeCompactScrollable {

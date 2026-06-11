@@ -27,9 +27,7 @@ func (m Model) renderDashboardGrid() string {
 		rightColumn,
 	)
 
-	help := footerStyle.Render(
-		truncateText(m.help.View(m.keys), m.contentWidth()),
-	)
+	help := footerStyle.Render(m.help.View(m.keys))
 
 	return appStyle.Render(strings.Join([]string{
 		header,
