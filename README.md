@@ -6,7 +6,7 @@ The project currently uses Open-Meteo for geocoding and forecast data.
 
 ## Current status
 
-Version: `v0.2.0`
+Version: `v0.2.1`
 
 Meteo TUI currently supports:
 - real location resolution from city and country code
@@ -35,6 +35,10 @@ go run ./cmd/meteo --city Copenhagen --country DK
 | r | refresh |
 | ↑ / k | previous day |
 | ↓ / j | next day |
+| u / pgup | scroll up |
+| d / pgdown | scroll down |
+| g / home | scroll top |
+| G / end | scroll bottom |
 | ? | toggle help |
 
 ## Requirements

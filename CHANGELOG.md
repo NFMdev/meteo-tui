@@ -1,5 +1,20 @@
 # Changelog
 
+## v0.2.1
+
+### Added
+
+- Added responsive layout for wider terminals
+- Added grid panel arrangement for larger screens
+- Added compact scrollable layout for smaller terminals
+- Added viewport scrolling for compact mode
+- Added dedicated scroll controls
+
+### Changed
+
+- Rearranged TUI dashboard so panels use horizontal space efficiently
+- Moved from single-column dashboard layout to an adaptative layout system
+
 ## v0.2.0
 
 ### Added
