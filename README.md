@@ -25,7 +25,7 @@ go run ./cmd/meteo --city Copenhagen --country DK
 
 You can also try another city:
 ```bash
-go run ./cmd/meteo --city Copenhagen --country DK
+go run ./cmd/meteo --city Madrid --country ES
 ```
 
 ## Controls
