@@ -1,5 +1,26 @@
 # Changelog
 
+## v0.3.0
+
+### Added
+- Added config model for default city and country.
+- Added XDG default config path resolution.
+- Added support for custom config paths with `--config`.
+- Added config loading from JSON.
+- Added config writing to JSON.
+- Added `--init-config` to create or update local config.
+- Added startup resolution priority: CLI flags, config file, fallback.
+- Added validation for default city and country.
+- Added country code normalization to uppercase.
+- Added tests for config path resolution.
+- Added tests for config loading and writing.
+- Added tests for startup option resolution.
+
+### Changed
+- `--city` and `--country` now default to empty values internally so the app can distinguish explicit CLI overrides from config values.
+- meteo can now run without `--city` and `--country`.
+- Startup logic now resolves the final location before creating the TUI model.
+
 ## v0.2.1
 
 ### Added
