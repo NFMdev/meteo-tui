@@ -15,6 +15,5 @@ var (
 
 	errorStyle = lipgloss.NewStyle().Bold(true)
 
-	footerStyle = lipgloss.NewStyle().
-			Faint(true)
+	footerStyle = lipgloss.NewStyle().Faint(true)
 )

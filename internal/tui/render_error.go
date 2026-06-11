@@ -22,7 +22,7 @@ func (m Model) renderError() string {
 		Width(m.panelWidth()).
 		Render(panelStyle.Render(joinTruncatedLines(lines, m.innerPanelWidth())))
 
-	help := footerStyle.Render(truncateText(m.help.View(m.keys), m.contentWidth()))
+	help := footerStyle.Render(m.help.View(m.keys))
 
 	return appStyle.Render(strings.Join([]string{
 		title,

@@ -29,6 +29,26 @@ func (m Model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		case key.Matches(msg, m.keys.Down):
 			m.selectNextDay()
 
+		case key.Matches(msg, m.keys.ScrollUp):
+			if m.layoutMode() == layoutModeCompactScrollable {
+				m.viewport.ScrollUp(3)
+			}
+
+		case key.Matches(msg, m.keys.ScrollDown):
+			if m.layoutMode() == layoutModeCompactScrollable {
+				m.viewport.ScrollDown(3)
+			}
+
+		case key.Matches(msg, m.keys.ScrollTop):
+			if m.layoutMode() == layoutModeCompactScrollable {
+				m.viewport.GotoTop()
+			}
+
+		case key.Matches(msg, m.keys.ScrollBottom):
+			if m.layoutMode() == layoutModeCompactScrollable {
+				m.viewport.GotoBottom()
+			}
+
 		case key.Matches(msg, m.keys.Help):
 			m.showHelp = !m.showHelp
 			m.help.ShowAll = m.showHelp
@@ -55,6 +75,8 @@ func (m Model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		m.err = nil
 		m.report = msg.report
 		m.selectedDay = 0
+		m.viewport.GotoTop()
+		m.rebuildViewportContent()
 
 	case weatherFailedMsg:
 		m.loading = false
@@ -64,6 +86,8 @@ func (m Model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		m.width = msg.Width
 		m.height = msg.Height
 		m.help.SetWidth(msg.Width)
+		m.configureViewport()
+		m.rebuildViewportContent()
 	}
 	return m, nil
 }
@@ -83,12 +107,20 @@ func (m Model) loadWeatherCmd() tea.Cmd {
 }
 
 func (m *Model) selectPreviousDay() {
+	if m.loading || m.err != nil {
+		return
+	}
+
 	if m.selectedDay > 0 {
 		m.selectedDay--
 	}
 }
 
 func (m *Model) selectNextDay() {
+	if m.loading || m.err != nil {
+		return
+	}
+
 	if m.selectedDay < len(m.report.Daily)-1 {
 		m.selectedDay++
 	}

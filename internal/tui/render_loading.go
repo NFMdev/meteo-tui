@@ -20,7 +20,7 @@ func (m Model) renderLoading() string {
 		Width(m.panelWidth()).
 		Render(joinTruncatedLines(lines, m.innerPanelWidth()))
 
-	help := footerStyle.Render(truncateText(m.help.View(m.keys), m.contentWidth()))
+	help := footerStyle.Render(m.help.View(m.keys))
 
 	return appStyle.Render(strings.Join([]string{
 		title,

@@ -19,6 +19,7 @@ func main() {
 	city := flag.String("city", "Copenhagen", "city name")
 	country := flag.String("country", "DK", "ISO 31166-1 alpha-2 country code")
 	fail := flag.Bool("fail", false, "simulate weather loading failure")
+	fake := flag.Bool("fake", false, "simulate fake weather service")
 
 	flag.Parse()
 
@@ -33,7 +34,7 @@ func main() {
 	}
 
 	httpClient := &http.Client{
-		Timeout: 10 * time.Second,
+		Timeout: 30 * time.Second,
 	}
 
 	locationResolver := location.NewOpenMeteoResolver(httpClient)
@@ -42,6 +43,8 @@ func main() {
 	var weatherService app.WeatherService
 	if *fail {
 		weatherService = app.NewFailingWeatherService(locationResolver)
+	} else if *fake {
+		weatherService = app.NewFakeWeatherService(locationResolver)
 	} else {
 		weatherService = app.NewWeatherService(locationResolver, forecastClient)
 	}

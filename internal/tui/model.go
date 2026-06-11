@@ -5,6 +5,7 @@ import (
 
 	"charm.land/bubbles/v2/help"
 	"charm.land/bubbles/v2/spinner"
+	"charm.land/bubbles/v2/viewport"
 
 	"github.com/nfmdev/meteo/internal/domain"
 )
@@ -27,9 +28,10 @@ type Model struct {
 	selectedDay int
 	showHelp    bool
 
-	keys    KeyMap
-	help    help.Model
-	spinner spinner.Model
+	keys     KeyMap
+	help     help.Model
+	spinner  spinner.Model
+	viewport viewport.Model
 
 	width  int
 	height int
@@ -46,5 +48,9 @@ func NewModel(city string, country string, loader WeatherLoader) Model {
 		keys:        DefaultKeyMap(),
 		help:        help.New(),
 		spinner:     spinner.New(spinner.WithSpinner(spinner.Dot)),
+		viewport: viewport.New(
+			viewport.WithWidth(defaultTerminalWidth),
+			viewport.WithHeight(20),
+		),
 	}
 }
