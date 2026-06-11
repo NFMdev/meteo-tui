@@ -52,7 +52,7 @@ func TestValidateConfigRejectsEmptyCountry(t *testing.T) {
 	t.Parallel()
 
 	err := ValidateConfig(AppConfig{
-		DefaultCity:    "Aalborg",
+		DefaultCity:    "Copenhagen",
 		DefaultCountry: "",
 	})
 
@@ -89,7 +89,7 @@ func TestValidateConfigRejectsInvalidCountryCode(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			err := ValidateConfig(AppConfig{
-				DefaultCity:    "Aalborg",
+				DefaultCity:    "Copenhagen",
 				DefaultCountry: tt.country,
 			})
 
