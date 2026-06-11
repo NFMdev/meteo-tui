@@ -7,7 +7,7 @@ func (m Model) View() tea.View {
 }
 
 func (m Model) render() string {
-	if m.isTerminalTooSmall() {
+	if m.layoutMode() == layoutModeTooSmall {
 		return m.renderSmallTerminal()
 	}
 
@@ -19,6 +19,15 @@ func (m Model) render() string {
 		return m.renderError()
 
 	default:
-		return m.renderDashboard()
+		switch m.layoutMode() {
+		case layoutModeGrid:
+			return m.renderDashboardGrid()
+
+		case layoutModeCompactScrollable:
+			return m.renderCompactScrollableDashboard()
+
+		default:
+			return m.renderSmallTerminal()
+		}
 	}
 }

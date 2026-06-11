@@ -9,37 +9,37 @@ func TestIsTerminalTooSmall(t *testing.T) {
 		name     string
 		width    int
 		height   int
-		expected bool
+		expected layoutMode
 	}{
 		{
 			name:     "unknown size is not considered too small",
 			width:    0,
 			height:   0,
-			expected: false,
+			expected: layoutModeCompactScrollable,
 		},
 		{
 			name:     "normal terminal",
 			width:    100,
 			height:   30,
-			expected: false,
+			expected: layoutModeGrid,
 		},
 		{
 			name:     "too narrow",
 			width:    minTerminalWidth - 1,
 			height:   minTerminalHeight,
-			expected: true,
+			expected: layoutModeTooSmall,
 		},
 		{
 			name:     "too short",
 			width:    minTerminalWidth,
 			height:   minTerminalHeight - 1,
-			expected: true,
+			expected: layoutModeTooSmall,
 		},
 		{
 			name:     "minimum size",
 			width:    minTerminalWidth,
 			height:   minTerminalHeight,
-			expected: false,
+			expected: layoutModeCompactScrollable,
 		},
 	}
 
@@ -50,7 +50,7 @@ func TestIsTerminalTooSmall(t *testing.T) {
 				height: tt.height,
 			}
 
-			got := model.isTerminalTooSmall()
+			got := model.layoutMode()
 
 			if got != tt.expected {
 				t.Fatalf("expected %v, got %v", tt.expected, got)

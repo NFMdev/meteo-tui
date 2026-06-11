@@ -23,6 +23,7 @@ func (m Model) contentWidth() int {
 	if width < 1 {
 		return 1
 	}
+
 	return width
 }
 
@@ -31,12 +32,12 @@ func (m Model) panelWidth() int {
 	if width < 1 {
 		return 1
 	}
+
 	return width
 }
 
 func (m Model) innerPanelWidth() int {
 	width := m.panelWidth() - panelHorizontalFrame
-
 	if width < 1 {
 		return 1
 	}
@@ -44,10 +45,18 @@ func (m Model) innerPanelWidth() int {
 	return width
 }
 
-func (m Model) isTerminalTooSmall() bool {
-	if m.width <= 0 || m.height <= 0 {
-		return false
+func (m Model) compactViewportHeight() int {
+	if m.height <= 0 {
+		return 20
 	}
 
-	return m.width < minTerminalWidth || m.height < minTerminalHeight
+	// Approx:
+	// app vertical padding + header + blank lines + help/footer.
+	height := m.height - 7
+
+	if height < 5 {
+		return 5
+	}
+
+	return height
 }

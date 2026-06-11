@@ -4,11 +4,8 @@ import (
 	"fmt"
 )
 
-func (m Model) renderDailyForecast() string {
-	lines := []string{
-		"Daily Forecast",
-		"",
-	}
+func (m Model) renderDailyForecast(width int, height int) string {
+	lines := make([]string, 0, len(m.report.Daily))
 
 	for index, day := range m.report.Daily {
 		cursor := " "
@@ -30,7 +27,5 @@ func (m Model) renderDailyForecast() string {
 		)
 	}
 
-	return panelStyle.
-		Width(m.panelWidth()).
-		Render(joinTruncatedLines(lines, m.innerPanelWidth()))
+	return renderPanel("Daily Forecast", lines, width, height)
 }

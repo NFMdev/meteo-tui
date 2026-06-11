@@ -4,27 +4,25 @@ import (
 	"fmt"
 )
 
-func (m Model) renderHourlyForecast() string {
+func (m Model) renderHourlyForecast(width int, height int) string {
 	selectedDay, ok := m.selectedDailyForecast()
 	if !ok {
-		return panelStyle.
-			Width(m.panelWidth()).
-			Render("Hourly Forecast\n\nNo selected day.")
+		return renderPanel("Hourly Forecast", []string{"No selected day."}, width, height)
 	}
 
 	hours := m.hourlyForecastForSelectedDay()
 
-	lines := []string{
-		fmt.Sprintf("Hourly Forecast — %s", selectedDay.Date.Format("Mon 02 Jun")),
-		"",
-	}
+	lines := make([]string, 0, len(hours)+1)
 
 	if len(hours) == 0 {
 		lines = append(lines, "No hourly forecast avaliable for this day.")
 
-		return panelStyle.
-			Width(m.panelWidth()).
-			Render(joinTruncatedLines(lines, m.innerPanelWidth()))
+		return renderPanel(
+			fmt.Sprintf("Hourly Forecast — %s", selectedDay.Date.Format("Mon 02 Jun")),
+			lines,
+			width,
+			height,
+		)
 	}
 
 	for _, hour := range hours {
@@ -40,7 +38,10 @@ func (m Model) renderHourlyForecast() string {
 		)
 	}
 
-	return panelStyle.
-		Width(m.panelWidth()).
-		Render(joinTruncatedLines(lines, m.innerPanelWidth()))
+	return renderPanel(
+		fmt.Sprintf("Hourly Forecast — %s", selectedDay.Date.Format("Mon 02 Jun")),
+		lines,
+		width,
+		height,
+	)
 }
