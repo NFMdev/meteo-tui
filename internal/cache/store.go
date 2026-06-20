@@ -125,6 +125,18 @@ func (s ForecastStore) ReadForecast(
 	return entry, nil
 }
 
+func (s ForecastStore) ReadReport(
+	city string,
+	country string,
+) (domain.WeatherReport, error) {
+	entry, err := s.ReadForecast(city, country)
+	if err != nil {
+		return domain.WeatherReport{}, err
+	}
+
+	return entry.Report, nil
+}
+
 func validateForecastCacheEntry(entry ForecastCacheEntry, expectedKey string) error {
 	if strings.TrimSpace(entry.Key) == "" {
 		return fmt.Errorf("%w: missing key", ErrInvalidCacheEntry)

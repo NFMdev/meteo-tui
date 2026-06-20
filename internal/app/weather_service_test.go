@@ -132,6 +132,265 @@ func TestRealWeatherServiceGetWeatherReturnsForecastProviderError(t *testing.T) 
 	}
 }
 
+func TestRealWeatherServiceGetWeatherWritesCacheAfterFreshSuccess(t *testing.T) {
+	t.Parallel()
+
+	location := testAppLocation()
+	report := testAppWeatherReport(location)
+
+	locationResolver := &fakeLocationResolver{
+		location: location,
+	}
+
+	forecastProvider := &fakeForecastProvider{
+		report: report,
+	}
+
+	cacheStore := &fakeForecastCacheStore{}
+
+	service := NewWeatherServiceWithCache(
+		locationResolver,
+		forecastProvider,
+		cacheStore,
+		WeatherServiceOptions{},
+	)
+
+	got, err := service.GetWeather(context.Background(), "Copenhagen", "DK")
+	if err != nil {
+		t.Fatalf("expected no error, got %v", err)
+	}
+
+	if got.Location.City != "Copenhagen" {
+		t.Fatalf("expected city Copenhagen, got %q", got.Location.City)
+	}
+
+	if !cacheStore.writeCalled {
+		t.Fatal("expected cache write to be called")
+	}
+
+	if cacheStore.writeCity != "Copenhagen" {
+		t.Fatalf("expected cache write city Copenhagen, got %q", cacheStore.writeCity)
+	}
+
+	if cacheStore.writeCountry != "DK" {
+		t.Fatalf("expected cache write country DK, got %q", cacheStore.writeCountry)
+	}
+}
+
+func TestRealWeatherServiceGetWeatherIgnoresCacheWriteError(t *testing.T) {
+	t.Parallel()
+
+	location := testAppLocation()
+	report := testAppWeatherReport(location)
+
+	locationResolver := &fakeLocationResolver{
+		location: location,
+	}
+
+	forecastProvider := &fakeForecastProvider{
+		report: report,
+	}
+
+	cacheStore := &fakeForecastCacheStore{
+		writeErr: errors.New("cache write failed"),
+	}
+
+	service := NewWeatherServiceWithCache(
+		locationResolver,
+		forecastProvider,
+		cacheStore,
+		WeatherServiceOptions{},
+	)
+
+	got, err := service.GetWeather(context.Background(), "Copenhagen", "DK")
+	if err != nil {
+		t.Fatalf("expected no error despite cache write failure, got %v", err)
+	}
+
+	if got.Location.City != "Copenhagen" {
+		t.Fatalf("expected city Copenhagen, got %q", got.Location.City)
+	}
+
+	if !cacheStore.writeCalled {
+		t.Fatal("expected cache write to be attempted")
+	}
+}
+
+func TestRealWeatherServiceGetWeatherFallsBackToCacheWhenLocationResolverFails(t *testing.T) {
+	t.Parallel()
+
+	cachedReport := testAppWeatherReport(testAppLocation())
+
+	locationResolver := &fakeLocationResolver{
+		err: errTestLocation,
+	}
+
+	forecastProvider := &fakeForecastProvider{}
+
+	cacheStore := &fakeForecastCacheStore{
+		readReport: cachedReport,
+	}
+
+	service := NewWeatherServiceWithCache(
+		locationResolver,
+		forecastProvider,
+		cacheStore,
+		WeatherServiceOptions{},
+	)
+
+	report, err := service.GetWeather(context.Background(), "Copenhagen", "DK")
+	if err != nil {
+		t.Fatalf("expected cached report, got error %v", err)
+	}
+
+	if !cacheStore.readCalled {
+		t.Fatal("expected cache read to be called")
+	}
+
+	if forecastProvider.called {
+		t.Fatal("expected forecast provider not to be called when location resolver fails")
+	}
+
+	if report.Location.City != "Copenhagen" {
+		t.Fatalf("expected cached city Copenhagen, got %q", report.Location.City)
+	}
+}
+
+func TestRealWeatherServiceGetWeatherFallsBackToCacheWhenForecastProviderFails(t *testing.T) {
+	t.Parallel()
+
+	location := testAppLocation()
+	cachedReport := testAppWeatherReport(location)
+
+	locationResolver := &fakeLocationResolver{
+		location: location,
+	}
+
+	forecastProvider := &fakeForecastProvider{
+		err: errTestForecast,
+	}
+
+	cacheStore := &fakeForecastCacheStore{
+		readReport: cachedReport,
+	}
+
+	service := NewWeatherServiceWithCache(
+		locationResolver,
+		forecastProvider,
+		cacheStore,
+		WeatherServiceOptions{},
+	)
+
+	report, err := service.GetWeather(context.Background(), "Copenhagen", "DK")
+	if err != nil {
+		t.Fatalf("expected cached report, got error %v", err)
+	}
+
+	if !cacheStore.readCalled {
+		t.Fatal("expected cache read to be called")
+	}
+
+	if report.Location.City != "Copenhagen" {
+		t.Fatalf("expected cached city Copenhagen, got %q", report.Location.City)
+	}
+}
+
+func TestRealWeatherServiceGetWeatherReturnsOriginalErrorWhenFallbackCacheFails(t *testing.T) {
+	t.Parallel()
+
+	location := testAppLocation()
+
+	locationResolver := &fakeLocationResolver{
+		location: location,
+	}
+
+	forecastProvider := &fakeForecastProvider{
+		err: errTestForecast,
+	}
+
+	cacheStore := &fakeForecastCacheStore{
+		readErr: errors.New("cache read failed"),
+	}
+
+	service := NewWeatherServiceWithCache(
+		locationResolver,
+		forecastProvider,
+		cacheStore,
+		WeatherServiceOptions{},
+	)
+
+	_, err := service.GetWeather(context.Background(), "Copenhagen", "DK")
+	if err == nil {
+		t.Fatal("expected error, got nil")
+	}
+
+	if !errors.Is(err, errTestForecast) {
+		t.Fatalf("expected original forecast error, got %v", err)
+	}
+}
+
+func TestRealWeatherServiceGetWeatherOfflineReadsCacheOnly(t *testing.T) {
+	t.Parallel()
+
+	cachedReport := testAppWeatherReport(testAppLocation())
+	locationResolver := &fakeLocationResolver{}
+	forecastProvider := &fakeForecastProvider{}
+	cacheStore := &fakeForecastCacheStore{
+		readReport: cachedReport,
+	}
+	service := NewWeatherServiceWithCache(
+		locationResolver,
+		forecastProvider,
+		cacheStore,
+		WeatherServiceOptions{
+			Offline: true,
+		},
+	)
+
+	report, err := service.GetWeather(context.Background(), "Copenhagen", "DK")
+	if err != nil {
+		t.Fatalf("expected cached report, got error %v", err)
+	}
+
+	if locationResolver.called {
+		t.Fatal("expected location resolver not to be called in offline mode")
+	}
+
+	if forecastProvider.called {
+		t.Fatal("expected forecast provider not to be called in offline mode")
+	}
+
+	if !cacheStore.readCalled {
+		t.Fatal("expected cache read to be called")
+	}
+
+	if report.Location.City != "Copenhagen" {
+		t.Fatalf("expected cached city Copenhagen, got %q", report.Location.City)
+	}
+}
+
+func TestRealWeatherServiceGetWeatherOfflineRequiresCacheStore(t *testing.T) {
+	t.Parallel()
+
+	service := NewWeatherServiceWithCache(
+		&fakeLocationResolver{},
+		&fakeForecastProvider{},
+		nil,
+		WeatherServiceOptions{
+			Offline: true,
+		},
+	)
+
+	_, err := service.GetWeather(context.Background(), "Copenhagen", "DK")
+	if err == nil {
+		t.Fatal("expected error, got nil")
+	}
+
+	if !errors.Is(err, ErrCacheStoreRequired) {
+		t.Fatalf("expected ErrCacheStoreRequired, got %v", err)
+	}
+}
+
 type fakeLocationResolver struct {
 	location domain.Location
 	err      error
@@ -234,4 +493,44 @@ func testAppWeatherReport(location domain.Location) domain.WeatherReport {
 			},
 		},
 	}
+}
+
+type fakeForecastCacheStore struct {
+	writeCalled  bool
+	writeCity    string
+	writeCountry string
+	writeReport  domain.WeatherReport
+	writeErr     error
+
+	readCalled  bool
+	readCity    string
+	readCountry string
+	readReport  domain.WeatherReport
+	readErr     error
+}
+
+func (s *fakeForecastCacheStore) WriteForecast(
+	city string,
+	country string,
+	report domain.WeatherReport,
+) {
+	s.writeCalled = true
+	s.writeCity = city
+	s.writeCountry = country
+	s.writeReport = report
+}
+
+func (s *fakeForecastCacheStore) ReadReport(
+	city string,
+	country string,
+) (domain.WeatherReport, error) {
+	s.readCalled = true
+	s.readCity = city
+	s.readCountry = country
+
+	if s.readErr != nil {
+		return domain.WeatherReport{}, s.readErr
+	}
+
+	return s.readReport, nil
 }

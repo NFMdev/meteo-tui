@@ -17,6 +17,12 @@ type WeatherService interface {
 type RealWeatherService struct {
 	locationResolver LocationResolver
 	forecastProvider ForecastProvider
+	cacheStore       ForecastCacheStore
+	options          WeatherServiceOptions
+}
+
+type WeatherServiceOptions struct {
+	Offline bool
 }
 
 // TODO: remove fake weather service before releasing v1.0
@@ -33,6 +39,20 @@ func NewWeatherService(
 	return RealWeatherService{
 		locationResolver: locationResolver,
 		forecastProvider: forecastProvider,
+	}
+}
+
+func NewWeatherServiceWithCache(
+	locationResolver LocationResolver,
+	forecastProvider ForecastProvider,
+	cacheStore ForecastCacheStore,
+	options WeatherServiceOptions,
+) RealWeatherService {
+	return RealWeatherService{
+		locationResolver: locationResolver,
+		forecastProvider: forecastProvider,
+		cacheStore:       cacheStore,
+		options:          options,
 	}
 }
 
@@ -54,15 +74,20 @@ func (s RealWeatherService) GetWeather(
 	city string,
 	country string,
 ) (domain.WeatherReport, error) {
+	if s.options.Offline {
+		return s.getCachedWeather(city, country)
+	}
+
 	location, err := s.locationResolver.Resolve(ctx, city, country)
 	if err != nil {
-		return domain.WeatherReport{}, err
+		return s.getCachedWeatherOrOriginalError(city, country, err)
 	}
 
 	report, err := s.forecastProvider.GetForecast(ctx, location)
 	if err != nil {
-		return domain.WeatherReport{}, err
+		return s.getCachedWeatherOrOriginalError(city, country, err)
 	}
+	s.writeCache(city, country, report)
 
 	return report, nil
 }
@@ -136,6 +161,7 @@ func (s FakeWeatherService) GetWeather(
 	return domain.WeatherReport{
 		Location:  location,
 		UpdatedAt: now,
+		Source:    domain.NewFreshWeatherSource(domain.WeatherProviderOpenMeteo),
 		Current: domain.CurrentWeather{
 			TemperatureC:     17.8,
 			FeelsLikeC:       14.2,
@@ -155,6 +181,45 @@ func (s FakeWeatherService) GetWeather(
 		Daily:  daily,
 		Hourly: hourly,
 	}, nil
+}
+
+func (s RealWeatherService) getCachedWeather(
+	city string,
+	country string,
+) (domain.WeatherReport, error) {
+	if s.cacheStore == nil {
+		return domain.WeatherReport{}, ErrCacheStoreRequired
+	}
+
+	return s.cacheStore.ReadReport(city, country)
+}
+
+func (s RealWeatherService) getCachedWeatherOrOriginalError(
+	city string,
+	country string,
+	originalErr error,
+) (domain.WeatherReport, error) {
+	if s.cacheStore == nil {
+		return domain.WeatherReport{}, originalErr
+	}
+
+	report, err := s.cacheStore.ReadReport(city, country)
+	if err != nil {
+		return domain.WeatherReport{}, originalErr
+	}
+
+	return report, nil
+}
+
+func (s RealWeatherService) writeCache(
+	city string,
+	country string,
+	report domain.WeatherReport,
+) {
+	if s.cacheStore == nil {
+		return
+	}
+	s.cacheStore.WriteForecast(city, country, report)
 }
 
 func beginningOfDay(t time.Time) time.Time {
