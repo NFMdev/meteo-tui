@@ -117,6 +117,11 @@ func (s ForecastStore) ReadForecast(
 		return ForecastCacheEntry{}, fmt.Errorf("validate forecast cache file %q: %w", path, err)
 	}
 
+	entry.Report.Source = domain.NewCachedWeatherSource(
+		entry.Report.Source.Provider,
+		entry.CachedAt,
+	)
+
 	return entry, nil
 }
 

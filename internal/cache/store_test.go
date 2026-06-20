@@ -50,6 +50,18 @@ func TestForecastStoreWriteAndReadForecast(t *testing.T) {
 		t.Fatalf("expected cached_at %v, got %v", fixedTime, entry.CachedAt)
 	}
 
+	if entry.Report.Source.Provider != domain.WeatherProviderOpenMeteo {
+		t.Fatalf("expected provider Open-Meteo, got %q", entry.Report.Source.Provider)
+	}
+
+	if !entry.Report.Source.Cached {
+		t.Fatal("expected cached report source")
+	}
+
+	if !entry.Report.Source.CachedAt.Equal(fixedTime) {
+		t.Fatalf("expected source cached_at %v, got %v", fixedTime, entry.Report.Source.CachedAt)
+	}
+
 	if entry.Report.Location.City != "Copenhagen" {
 		t.Fatalf("expected report city Copenhagen, got %q", entry.Report.Location.City)
 	}
@@ -124,17 +136,18 @@ func TestForecastStoreReadRejectsUnknownFields(t *testing.T) {
 		"unknown_field": true,
 		"report": {
 			"Location": {
-				"City": "Copenhagen",
-				"Country": "DK",
-				"Latitude": 57.048,
-				"Longitude": 9.9187,
-				"Timezone": "Europe/Copenhagen"
+				"city": "Copenhagen",
+				"country": "DK",
+				"latitude": 57.048,
+				"longitude": 9.9187,
+				"timezone": "Europe/Copenhagen"
 			},
-			"UpdatedAt": "2026-06-10T12:00:00Z",
-			"Current": {},
-			"Metrics": {},
-			"Daily": [],
-			"Hourly": []
+			"updated_at": "2026-06-10T12:00:00Z",
+			"source": {},
+			"current": {},
+			"metrics": {},
+			"daily": [],
+			"hourly": []
 		}
 	}`
 
@@ -230,6 +243,7 @@ func testWeatherReport() domain.WeatherReport {
 	return domain.WeatherReport{
 		Location:  location,
 		UpdatedAt: time.Date(2026, 6, 10, 12, 0, 0, 0, time.UTC),
+		Source:    domain.NewFreshWeatherSource(domain.WeatherProviderOpenMeteo),
 		Current: domain.CurrentWeather{
 			TemperatureC:     18.5,
 			FeelsLikeC:       17.9,
