@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"strings"
 
+	forecastCache "github.com/nfmdev/meteo/internal/cache"
 	meteoConfig "github.com/nfmdev/meteo/internal/config"
 )
 
@@ -17,24 +18,31 @@ type startupOptions struct {
 	city       string
 	country    string
 	configPath string
+	cacheDir   string
 	initConfig bool
+	offline    bool
 	fail       bool
-	fake       bool
 }
 
 type resolvedStartupOptions struct {
 	city       string
 	country    string
 	configPath string
+	cacheDir   string
 	initConfig bool
+	offline    bool
 	fail       bool
-	fake       bool
 }
 
 func resolveStartupOptions(options startupOptions) (resolvedStartupOptions, error) {
 	configPath, err := meteoConfig.ResolveConfigPath(options.configPath)
 	if err != nil {
 		return resolvedStartupOptions{}, fmt.Errorf("resolve config path: %w", err)
+	}
+
+	cacheDir, err := forecastCache.ResolveForecastCacheDir(options.cacheDir)
+	if err != nil {
+		return resolvedStartupOptions{}, fmt.Errorf("resolve cache directory: %w", err)
 	}
 
 	loadedConfig, err := loadOptionalConfig(configPath)
@@ -71,9 +79,10 @@ func resolveStartupOptions(options startupOptions) (resolvedStartupOptions, erro
 		city:       finalConfig.DefaultCity,
 		country:    finalConfig.DefaultCountry,
 		configPath: configPath,
+		cacheDir:   cacheDir,
 		initConfig: options.initConfig,
+		offline:    options.offline,
 		fail:       options.fail,
-		fake:       options.fake,
 	}, nil
 }
 

@@ -10,6 +10,7 @@ import (
 	tea "charm.land/bubbletea/v2"
 
 	"github.com/nfmdev/meteo/internal/app"
+	forecastCache "github.com/nfmdev/meteo/internal/cache"
 	meteoConfig "github.com/nfmdev/meteo/internal/config"
 	"github.com/nfmdev/meteo/internal/location"
 	"github.com/nfmdev/meteo/internal/tui"
@@ -20,9 +21,10 @@ func main() {
 	city := flag.String("city", "", "city name")
 	country := flag.String("country", "", "ISO 31166-1 alpha-2 country code")
 	configPath := flag.String("config", "", "custom config file path")
+	cacheDir := flag.String("cache", "", "custom forecast cache directory")
 	initConfig := flag.Bool("init-config", false, "create or update the config file and exit")
+	offline := flag.Bool("offline", false, "use cached forecast data only")
 	fail := flag.Bool("fail", false, "simulate weather loading failure")
-	fake := flag.Bool("fake", false, "simulate fake weather service")
 
 	flag.Parse()
 
@@ -30,9 +32,10 @@ func main() {
 		city:       *city,
 		country:    *country,
 		configPath: *configPath,
+		cacheDir:   *cacheDir,
 		initConfig: *initConfig,
+		offline:    *offline,
 		fail:       *fail,
-		fake:       *fake,
 	})
 	if err != nil {
 		fmt.Fprintf(os.Stderr, "meteo: %v\n", err)
@@ -60,21 +63,33 @@ func main() {
 		return
 	}
 
+	forecastStore, err := forecastCache.NewForecastStore(resolvedOptions.cacheDir)
+	if err != nil {
+		fmt.Fprintf(os.Stderr, "meteo: failed to create forecast cache store: %v\n", err)
+		os.Exit(1)
+	}
+
 	httpClient := &http.Client{
 		Timeout: 30 * time.Second,
 	}
 
 	locationResolver := location.NewOpenMeteoResolver(httpClient)
-	forecastClient := openmeteo.NewClient(httpClient)
 
-	var weatherService app.WeatherService
-	if *fail {
-		weatherService = app.NewFailingWeatherService(locationResolver)
-	} else if *fake {
-		weatherService = app.NewFakeWeatherService(locationResolver)
+	var forecastProvider app.ForecastProvider
+	if resolvedOptions.fail {
+		forecastProvider = app.FailForecastProvider{}
 	} else {
-		weatherService = app.NewWeatherService(locationResolver, forecastClient)
+		forecastProvider = openmeteo.NewClient(httpClient)
 	}
+
+	weatherService := app.NewWeatherServiceWithCache(
+		locationResolver,
+		forecastProvider,
+		forecastStore,
+		app.WeatherServiceOptions{
+			Offline: resolvedOptions.offline,
+		},
+	)
 
 	model := tui.NewModel(resolvedOptions.city, resolvedOptions.country, weatherService)
 

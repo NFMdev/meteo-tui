@@ -113,7 +113,6 @@ will still work even if no config file exists.
 | --config | Custom config file path |
 | --init-config | Create or update config and exit |
 | --fail | Simulate weather loading failure for development/testing |
-| --fake | Simulate weather fake data for development/testing |
 
 ## Built With
 - Go

@@ -280,23 +280,42 @@ func TestResolveStartupOptionsPreservesFailFlag(t *testing.T) {
 	}
 }
 
-func TestResolveStartupOptionsPreservesFakeFlag(t *testing.T) {
+func TestResolveStartupOptionsResolvesCustomCacheDir(t *testing.T) {
 	t.Parallel()
 
-	configPath := filepath.Join(t.TempDir(), "config.json")
+	configPath := filepath.Join(t.TempDir(), "missing-config.json")
+	cacheDir := filepath.Join(t.TempDir(), "custom-cache")
 
 	resolved, err := resolveStartupOptions(startupOptions{
-		city:       "Copenhagen",
-		country:    "DK",
 		configPath: configPath,
-		fake:       true,
+		cacheDir:   cacheDir,
 	})
 	if err != nil {
 		t.Fatalf("expected no error, got %v", err)
 	}
 
-	if !resolved.fake {
-		t.Fatal("expected fake to be true")
+	if resolved.cacheDir != cacheDir {
+		t.Fatalf("expected cache dir %q, got %q", cacheDir, resolved.cacheDir)
+	}
+}
+
+func TestResolveStartupOptionsPreservesOfflineFlag(t *testing.T) {
+	t.Parallel()
+
+	configPath := filepath.Join(t.TempDir(), "missing-config.json")
+	cacheDir := filepath.Join(t.TempDir(), "custom-cache")
+
+	resolved, err := resolveStartupOptions(startupOptions{
+		configPath: configPath,
+		cacheDir:   cacheDir,
+		offline:    true,
+	})
+	if err != nil {
+		t.Fatalf("expected no errors, got %v", err)
+	}
+
+	if !resolved.offline {
+		t.Fatal("expected offline to be true")
 	}
 }
 

@@ -513,11 +513,12 @@ func (s *fakeForecastCacheStore) WriteForecast(
 	city string,
 	country string,
 	report domain.WeatherReport,
-) {
+) error {
 	s.writeCalled = true
 	s.writeCity = city
 	s.writeCountry = country
 	s.writeReport = report
+	return nil
 }
 
 func (s *fakeForecastCacheStore) ReadReport(
