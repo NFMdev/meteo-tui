@@ -18,8 +18,9 @@ func (m Model) renderHeader() string {
 	metadata := subtitleStyle.Render(
 		truncateText(
 			fmt.Sprintf(
-				"Updated: %s • %.4f, %.4f • %s",
-				m.report.UpdatedAt.Format("15:04:05"),
+				"Updated: %s • %s • %.4f, %.4f • %s",
+				formatWeatherTimestamp(m.report.UpdatedAt),
+				weatherSourceLabel(m.report),
 				location.Latitude,
 				location.Longitude,
 				location.Timezone,
