@@ -61,7 +61,7 @@ func (m Model) dashboardContentHeight() int {
 		return 26
 	}
 
-	height := m.height - 7
+	height := m.height - 10
 	if height < 10 {
 		return 10
 	}
