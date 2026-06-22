@@ -316,6 +316,25 @@ func TestWeatherCodeDescription(t *testing.T) {
 	}
 }
 
+func TestMapForecastResponseMarksReportAsFreshOpenMeteoData(t *testing.T) {
+	location := testLocation()
+	dto := testForecastResponseDTO()
+
+	report, err := mapForecastResponse(location, dto)
+	if err != nil {
+		t.Fatalf("expected no error, got %v", err)
+	}
+	if report.Source.Provider != domain.WeatherProviderOpenMeteo {
+		t.Fatalf("expected provider Open-Meteo, got %q", report.Source.Provider)
+	}
+	if report.Source.Cached {
+		t.Fatal("expected fresh report, got cached report")
+	}
+	if !report.Source.CachedAt.IsZero() {
+		t.Fatalf("expected zero cached_at for fresh report, got %v", report.Source.CachedAt)
+	}
+}
+
 func testLocation() domain.Location {
 	return domain.Location{
 		City:      "Copenhagen",

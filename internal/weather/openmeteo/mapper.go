@@ -27,6 +27,7 @@ func mapForecastResponse(
 	report := domain.WeatherReport{
 		Location:  location,
 		UpdatedAt: updatedAt,
+		Source:    domain.NewFreshWeatherSource(domain.WeatherProviderOpenMeteo),
 		Current: domain.CurrentWeather{
 			TemperatureC:     dto.Current.Temperature2m,
 			FeelsLikeC:       dto.Current.ApparentTemperature,

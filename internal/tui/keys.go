@@ -15,6 +15,7 @@ type KeyMap struct {
 	ScrollBottom key.Binding
 }
 
+// TODO: Separate single-column keys from multicolumn
 func DefaultKeyMap() KeyMap {
 	return KeyMap{
 		Up: key.NewBinding(
