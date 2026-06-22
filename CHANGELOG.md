@@ -1,5 +1,25 @@
 # Changelog
 
+## v0.4.0
+
+### Added
+- Added local cache
+- Added XDG default cache path resolution
+- Added JSON cache files
+- Added key generation from city and country, giving a cache file for each city-country
+- Added cache store for reading and writing
+- Added `--cache` CLI flag for custom cache directories
+- Added `__offline` CLI flag to skp network accesss and use cache only
+- Added cached-data indicator in the TUI header
+- Added tests for cache keys, paths, store, source metadata, app fallback behavior, and source labels
+
+### Changed
+- The weather service can now save successful forecasts to cache
+- The weather service can fallback to cache if location or forecast loading fails
+- `--fail` development flag now simulates provider failure so cache fallback can be tested
+- TUI header displays whether data is new or cached
+- Changed grid content height to fit header 
+
 ## v0.3.0
 
 ### Added

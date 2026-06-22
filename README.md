@@ -87,7 +87,36 @@ Then run with:
 meteo --config /tmp/meteo-config.json
 ```
 
-### Location resolution priority
+## Cache
+Meteo TUI stores the latest successful forecast locally so the app can still be useful when the network or the weather provider are unavalilable.
+By  default, forecast cache files are stored under:
+`~/.cache/meteo/forecasts/`
+Each location gets its own cache file.
+Ex:
+`~/.cache/meteo/forecasts/copenhagen_dk.json`
+`~/.cache/meteo/forecasts/madrid_es.json`
+
+### Default behavior
+When running Meteo app, the program will:
+1. Resolve the given location
+2. Fetch data from Open-Meteo
+3. Show forecast
+4. Save forecast to local cache
+
+### Offline mode
+Offline mode skips network access and reads from cache only:
+```bash
+meteo --city Copenhagen --country DK --offline
+```
+[!Note] If no cache exists for the requested location, the app shows an error state.
+
+### Custo cache directory
+You can choose a custom cache directory:
+```bash
+meteo --city Copenhagen --country DK --cache /tmp/meteo-cache
+```
+
+## Location resolution priority
 Location resolution priority
 
 Meteo resolves the final location in this order:
@@ -96,23 +125,20 @@ Meteo resolves the final location in this order:
 2. Config file
 3. Built-in fallback
 
-The built-in fallback is:
-Copenhagen, DK
+The built-in fallback is `Copenhagen, DK`
 
-This means:
-```bash
-meteo
-```
-will still work even if no config file exists.
+This means `meteo` will still run even if no config file exists.
 
-### CLI flags
+## CLI flags
 | Key | Action |
 | :--- | :--- |
 | --city | City name |
 | --country | ISO 3166-1 alpha-2 country code |
 | --config | Custom config file path |
 | --init-config | Create or update config and exit |
-| --fail | Simulate weather loading failure for development/testing |
+| --cache | Custom forecast cache directory |
+| --offline | Use cached forecast data only |
+| --fail | Simulate provider failure for development/testing |
 
 ## Built With
 - Go
