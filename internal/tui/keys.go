@@ -13,6 +13,10 @@ type KeyMap struct {
 	ScrollDown   key.Binding
 	ScrollTop    key.Binding
 	ScrollBottom key.Binding
+
+	Search key.Binding
+	Cancel key.Binding
+	Submit key.Binding
 }
 
 // TODO: Separate single-column keys from multicolumn
@@ -54,6 +58,18 @@ func DefaultKeyMap() KeyMap {
 			key.WithKeys("end", "G"),
 			key.WithHelp("G/end", "bottom"),
 		),
+		Search: key.NewBinding(
+			key.WithKeys("s"),
+			key.WithHelp("s", "search location"),
+		),
+		Cancel: key.NewBinding(
+			key.WithKeys("esc"),
+			key.WithHelp("esc", "cancel"),
+		),
+		Submit: key.NewBinding(
+			key.WithKeys("enter"),
+			key.WithHelp("enter", "submit"),
+		),
 	}
 }
 
@@ -64,6 +80,7 @@ func (k KeyMap) ShortHelp() []key.Binding {
 		k.ScrollUp,
 		k.ScrollDown,
 		k.Refresh,
+		k.Search,
 		k.Help,
 		k.Quit,
 	}
@@ -83,6 +100,9 @@ func (k KeyMap) FullHelp() [][]key.Binding {
 		},
 		{
 			k.Refresh,
+			k.Search,
+		},
+		{
 			k.Help,
 			k.Quit,
 		},

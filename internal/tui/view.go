@@ -11,6 +11,10 @@ func (m Model) render() string {
 		return m.renderSmallTerminal()
 	}
 
+	if m.mode == screenModeSearchInput {
+		return m.renderSearchInput()
+	}
+
 	switch {
 	case m.loading:
 		return m.renderLoading()
@@ -26,6 +30,7 @@ func (m Model) render() string {
 		case layoutModeCompactScrollable:
 			return m.renderCompactScrollableDashboard()
 
+		// TODO: If unknown mode return error screen
 		default:
 			return m.renderSmallTerminal()
 		}

@@ -5,6 +5,7 @@ import (
 
 	"charm.land/bubbles/v2/help"
 	"charm.land/bubbles/v2/spinner"
+	"charm.land/bubbles/v2/textinput"
 	"charm.land/bubbles/v2/viewport"
 
 	"github.com/nfmdev/meteo/internal/domain"
@@ -27,11 +28,14 @@ type Model struct {
 
 	selectedDay int
 	showHelp    bool
+	keys        KeyMap
+	help        help.Model
+	spinner     spinner.Model
+	viewport    viewport.Model
 
-	keys     KeyMap
-	help     help.Model
-	spinner  spinner.Model
-	viewport viewport.Model
+	mode        screenMode
+	searchInput textinput.Model
+	searchErr   error
 
 	width  int
 	height int
@@ -52,5 +56,17 @@ func NewModel(city string, country string, loader WeatherLoader) Model {
 			viewport.WithWidth(defaultTerminalWidth),
 			viewport.WithHeight(20),
 		),
+		mode:        screenModeDashboard,
+		searchInput: newSearchInput(),
 	}
+}
+
+func newSearchInput() textinput.Model {
+	input := textinput.New()
+	input.Placeholder = "Search city..."
+	input.Prompt = "> "
+	input.CharLimit = 80
+	input.SetWidth(40)
+
+	return input
 }

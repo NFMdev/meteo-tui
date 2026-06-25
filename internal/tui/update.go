@@ -19,52 +19,18 @@ func (m Model) Init() tea.Cmd {
 func (m Model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 	switch msg := msg.(type) {
 	case tea.KeyPressMsg:
-		switch {
-		case key.Matches(msg, m.keys.Quit):
+		if key.Matches(msg, m.keys.Quit) {
 			return m, tea.Quit
-
-		case key.Matches(msg, m.keys.Up):
-			m.selectPreviousDay()
-			m.rebuildViewportContent()
-
-		case key.Matches(msg, m.keys.Down):
-			m.selectNextDay()
-			m.rebuildViewportContent()
-
-		case key.Matches(msg, m.keys.ScrollUp):
-			if m.layoutMode() == layoutModeCompactScrollable {
-				m.viewport.ScrollUp(3)
-			}
-
-		case key.Matches(msg, m.keys.ScrollDown):
-			if m.layoutMode() == layoutModeCompactScrollable {
-				m.viewport.ScrollDown(3)
-			}
-
-		case key.Matches(msg, m.keys.ScrollTop):
-			if m.layoutMode() == layoutModeCompactScrollable {
-				m.viewport.GotoTop()
-			}
-
-		case key.Matches(msg, m.keys.ScrollBottom):
-			if m.layoutMode() == layoutModeCompactScrollable {
-				m.viewport.GotoBottom()
-			}
-
-		case key.Matches(msg, m.keys.Help):
-			m.showHelp = !m.showHelp
-			m.help.ShowAll = m.showHelp
-
-		case key.Matches(msg, m.keys.Refresh):
-			m.loading = true
-			m.err = nil
-			m.selectedDay = 0
-
-			return m, tea.Batch(
-				m.spinner.Tick,
-				m.loadWeatherCmd(),
-			)
 		}
+
+		switch m.mode {
+		case screenModeSearchInput:
+			return m.updateSearchInputKey(msg)
+
+		default:
+			return m.updateDashboardKey(msg)
+		}
+
 	case spinner.TickMsg:
 		if m.loading {
 			var cmd tea.Cmd
@@ -105,25 +71,5 @@ func (m Model) loadWeatherCmd() tea.Cmd {
 		}
 
 		return weatherLoadedMsg{report: report}
-	}
-}
-
-func (m *Model) selectPreviousDay() {
-	if m.loading || m.err != nil {
-		return
-	}
-
-	if m.selectedDay > 0 {
-		m.selectedDay--
-	}
-}
-
-func (m *Model) selectNextDay() {
-	if m.loading || m.err != nil {
-		return
-	}
-
-	if m.selectedDay < len(m.report.Daily)-1 {
-		m.selectedDay++
 	}
 }
