@@ -1,5 +1,21 @@
 # Changelog
 
+## v0.5.0
+
+### Added
+- Added location search
+- Added `LocationSearchResult`model
+- Added Open-Meteo location search adapter
+- Added location search service
+- Added TUI modes [search, input, dashboard]
+- Added keyboard navigation for search results
+- Added tests for Open-Meteo search, app search service, and result labels
+
+### Changed
+- Dashboard help now includes location search shortcut
+- TUI model support for screen modes
+- App can change active locaiton during a session without restarting
+
 ## v0.4.0
 
 ### Added

@@ -7,4 +7,5 @@ var (
 	ErrCountryRequired      = errors.New("country is required")
 	ErrLocationNotFound     = errors.New("location not found")
 	ErrInvalidGeocoodeReply = errors.New("invalid geocoding response")
+	ErrSearchQueryRequired  = errors.New("search query is required")
 )
