@@ -9,3 +9,11 @@ type weatherLoadedMsg struct {
 type weatherFailedMsg struct {
 	err error
 }
+
+type locationSearchLoadedMsg struct {
+	results []domain.LocationSearchResult
+}
+
+type locationSearchFailedMsg struct {
+	err error
+}

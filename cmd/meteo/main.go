@@ -74,6 +74,8 @@ func main() {
 	}
 
 	locationResolver := location.NewOpenMeteoResolver(httpClient)
+	locationSearcher := location.NewOpenMeteoSearcher(httpClient)
+	locationnSearchService := app.NewLocationSearchService(locationSearcher)
 
 	var forecastProvider app.ForecastProvider
 	if resolvedOptions.fail {
@@ -91,7 +93,12 @@ func main() {
 		},
 	)
 
-	model := tui.NewModel(resolvedOptions.city, resolvedOptions.country, weatherService)
+	model := tui.NewModelWithSearch(
+		resolvedOptions.city,
+		resolvedOptions.country,
+		weatherService,
+		locationnSearchService,
+	)
 
 	program := tea.NewProgram(model)
 

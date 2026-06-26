@@ -19,12 +19,45 @@ func (m Model) updateSearchInputKey(msg tea.KeyPressMsg) (Model, tea.Cmd) {
 			return m, nil
 		}
 
+		m.mode = screenModeSearchResults
+		m.searching = true
 		m.searchErr = nil
-		return m, nil
+		m.searchResults = nil
+		m.selectedSearchResult = 0
+		m.searchInput.Blur()
+
+		return m, m.searchLocationsCmd(query)
 	}
 
 	var cmd tea.Cmd
 	m.searchInput, cmd = m.searchInput.Update(msg)
 
 	return m, cmd
+}
+
+func (m Model) updateSearchResultKey(msg tea.KeyPressMsg) (Model, tea.Cmd) {
+	switch {
+	case key.Matches(msg, m.keys.Cancel):
+		m.mode = screenModeSearchInput
+		m.searching = false
+		m.searchErr = nil
+		return m, m.searchInput.Focus()
+
+	case key.Matches(msg, m.keys.Up):
+		if m.selectedSearchResult > 0 {
+			m.selectedSearchResult--
+		}
+		return m, nil
+
+	case key.Matches(msg, m.keys.Down):
+		if m.selectedSearchResult < len(m.searchResults)-1 {
+			m.selectedSearchResult++
+		}
+		return m, nil
+
+	case key.Matches(msg, m.keys.Submit):
+		// TODO: send location to weather service
+		return m, nil
+	}
+	return m, nil
 }

@@ -27,12 +27,15 @@ func (m Model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		case screenModeSearchInput:
 			return m.updateSearchInputKey(msg)
 
+		case screenModeSearchResults:
+			return m.updateSearchResultKey(msg)
+
 		default:
 			return m.updateDashboardKey(msg)
 		}
 
 	case spinner.TickMsg:
-		if m.loading {
+		if m.loading || m.searching {
 			var cmd tea.Cmd
 			m.spinner, cmd = m.spinner.Update(msg)
 			return m, cmd
@@ -49,6 +52,22 @@ func (m Model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 	case weatherFailedMsg:
 		m.loading = false
 		m.err = msg.err
+
+	case locationSearchLoadedMsg:
+		m.searching = false
+		m.searchErr = nil
+		m.searchResults = msg.results
+		m.selectedSearchResult = 0
+		m.mode = screenModeSearchResults
+		return m, nil
+
+	case locationSearchFailedMsg:
+		m.searching = false
+		m.searchErr = msg.err
+		m.searchResults = nil
+		m.selectedSearchResult = 0
+		m.mode = screenModeSearchResults
+		return m, nil
 
 	case tea.WindowSizeMsg:
 		m.width = msg.Width

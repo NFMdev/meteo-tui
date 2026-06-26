@@ -11,8 +11,12 @@ func (m Model) render() string {
 		return m.renderSmallTerminal()
 	}
 
-	if m.mode == screenModeSearchInput {
+	switch m.mode {
+	case screenModeSearchInput:
 		return m.renderSearchInput()
+
+	case screenModeSearchResults:
+		return m.renderSearchResults()
 	}
 
 	switch {

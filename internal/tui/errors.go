@@ -3,5 +3,6 @@ package tui
 import "errors"
 
 var (
-	errSearchQueryRequired = errors.New("search query is required")
+	errSearchQueryRequired          = errors.New("search query is required")
+	errLocationSearchLoaderRequired = errors.New("location search loader is required")
 )
