@@ -1,7 +1,5 @@
 package tui
 
-import "strings"
-
 func (m Model) renderSearchInput() string {
 	lines := []string{
 		"Search location",
@@ -17,8 +15,4 @@ func (m Model) renderSearchInput() string {
 	}
 
 	return panelStyle.Width(m.panelWidth()).Render(joinTruncatedLines(lines, m.innerPanelWidth()))
-}
-
-func hasSearchQuery(value string) bool {
-	return strings.TrimSpace(value) != ""
 }

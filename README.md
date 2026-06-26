@@ -37,11 +37,19 @@ go run ./cmd/meteo --city Madrid --country ES
 | r | refresh |
 | ↑ / k | previous day |
 | ↓ / j | next day |
+| s | open location search |
 | u / pgup | scroll up |
 | d / pgdown | scroll down |
 | g / home | scroll top |
 | G / end | scroll bottom |
 | ? | toggle help |
+
+### Inside location search screen
+| Key | Action |
+| :---: | :---: |
+| ↑ / ↓ | move through location results |
+| Enter ⏎ | search location / load selected location |
+| Esc | go back |
 
 ## Requirements
 - Go
@@ -110,7 +118,7 @@ meteo --city Copenhagen --country DK --offline
 ```
 [!Note] If no cache exists for the requested location, the app shows an error state.
 
-### Custo cache directory
+### Custom cache directory
 You can choose a custom cache directory:
 ```bash
 meteo --city Copenhagen --country DK --cache /tmp/meteo-cache
@@ -128,6 +136,9 @@ Meteo resolves the final location in this order:
 The built-in fallback is `Copenhagen, DK`
 
 This means `meteo` will still run even if no config file exists.
+
+### Location search
+Users can search locations from  inside the TUI and load weather reports for selected location, this does not update the default config and there is no search history.
 
 ## CLI flags
 | Key | Action |

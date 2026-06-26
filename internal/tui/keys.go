@@ -77,12 +77,12 @@ func (k KeyMap) ShortHelp() []key.Binding {
 	return []key.Binding{
 		k.Up,
 		k.Down,
+		k.Search,
+		k.Refresh,
+		k.Quit,
+		k.Help,
 		k.ScrollUp,
 		k.ScrollDown,
-		k.Refresh,
-		k.Search,
-		k.Help,
-		k.Quit,
 	}
 }
 
