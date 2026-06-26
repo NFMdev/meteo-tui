@@ -44,7 +44,7 @@ func (m Model) renderSearchResults() string {
 		)
 	}
 
-	lines = append(lines, "", "↑/↓ select result • Enter ⏎ select • Esc back")
+	lines = append(lines, "", "↑/↓ select result • Enter ⏎ load weather • Esc back")
 	return panelStyle.
 		Width(m.panelWidth()).
 		Render(joinTruncatedLines(lines, m.innerPanelWidth()))

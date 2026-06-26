@@ -56,8 +56,22 @@ func (m Model) updateSearchResultKey(msg tea.KeyPressMsg) (Model, tea.Cmd) {
 		return m, nil
 
 	case key.Matches(msg, m.keys.Submit):
-		// TODO: send location to weather service
-		return m, nil
+		result, ok := m.selectedLocationSearchResult()
+		if !ok {
+			m.searchErr = errSearchResultRequired
+			return m, nil
+		}
+
+		m.city = result.Name
+		m.country = result.CountryCode
+		m.mode = screenModeDashboard
+		m.loading = true
+		m.err = nil
+		m.selectedSearchResult = 0
+		m.searchInput.SetValue("")
+		m.searchInput.Blur()
+
+		return m, m.loadWeatherCmd()
 	}
-	return m, nil
+	return m, m.loadWeatherCmd()
 }
