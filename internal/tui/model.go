@@ -19,12 +19,20 @@ type LocationSearchLoader interface {
 	SearchLocations(ctx context.Context, query string) ([]domain.LocationSearchResult, error)
 }
 
+type LocationPreferencesLoader interface {
+	ListFavorites(ctx context.Context) ([]domain.SavedLocation, error)
+	AddFavorite(ctx context.Context, location domain.SavedLocation) error
+	RemoveFavorite(ctx context.Context, location domain.SavedLocation) error
+	SetDefaultLocation(ctx context.Context, location domain.SavedLocation) error
+}
+
 type Model struct {
 	city    string
 	country string
 
-	loader               WeatherLoader
-	locationSearchLoader LocationSearchLoader
+	weatherLoader             WeatherLoader
+	locationSearchLoader      LocationSearchLoader
+	locationPreferencesLoader LocationPreferencesLoader
 
 	report domain.WeatherReport
 
@@ -45,21 +53,54 @@ type Model struct {
 	selectedSearchResult int
 	searchErr            error
 
+	statusMessage string
+
 	width  int
 	height int
 }
 
-func NewModel(city string, country string, loader WeatherLoader) Model {
+func NewModel(
+	city string,
+	country string,
+	weatherLoader WeatherLoader,
+) Model {
+	return NewModelWithSearchAndPreferences(city, country, weatherLoader, nil, nil)
+}
+
+func NewModelWithSearch(
+	city string,
+	country string,
+	weatherLoader WeatherLoader,
+	locationSearchLoader LocationSearchLoader,
+) Model {
+	return NewModelWithSearchAndPreferences(
+		city,
+		country,
+		weatherLoader,
+		locationSearchLoader,
+		nil,
+	)
+}
+
+func NewModelWithSearchAndPreferences(
+	city string,
+	country string,
+	weatherLoader WeatherLoader,
+	locationSearchLoader LocationSearchLoader,
+	locationPreferencesLoader LocationPreferencesLoader,
+) Model {
 	return Model{
-		city:        city,
-		country:     country,
-		loader:      loader,
-		loading:     true,
-		selectedDay: 0,
-		showHelp:    false,
-		keys:        DefaultKeyMap(),
-		help:        help.New(),
-		spinner:     spinner.New(spinner.WithSpinner(spinner.Dot)),
+		city:                      city,
+		country:                   country,
+		weatherLoader:             weatherLoader,
+		locationSearchLoader:      locationSearchLoader,
+		locationPreferencesLoader: locationPreferencesLoader,
+		loading:                   true,
+		selectedDay:               0,
+		showHelp:                  false,
+		keys:                      DefaultKeyMap(),
+		help:                      help.New(),
+		spinner:                   spinner.New(spinner.WithSpinner(spinner.Dot)),
 		viewport: viewport.New(
 			viewport.WithWidth(defaultTerminalWidth),
 			viewport.WithHeight(20),
@@ -77,30 +118,4 @@ func newSearchInput() textinput.Model {
 	input.SetWidth(40)
 
 	return input
-}
-
-func NewModelWithSearch(
-	city string,
-	country string,
-	loader WeatherLoader,
-	locationSearchLoader LocationSearchLoader,
-) Model {
-	return Model{
-		city:                 city,
-		country:              country,
-		loader:               loader,
-		locationSearchLoader: locationSearchLoader,
-		loading:              true,
-		selectedDay:          0,
-		showHelp:             false,
-		keys:                 DefaultKeyMap(),
-		help:                 help.New(),
-		spinner:              spinner.New(spinner.WithSpinner(spinner.Dot)),
-		viewport: viewport.New(
-			viewport.WithWidth(defaultTerminalWidth),
-			viewport.WithHeight(20),
-		),
-		mode:        screenModeDashboard,
-		searchInput: newSearchInput(),
-	}
 }

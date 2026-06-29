@@ -42,6 +42,12 @@ func main() {
 		os.Exit(1)
 	}
 
+	locationPreferencesService, err := app.NewConfigLocationPreferencesService(resolvedOptions.configPath)
+	if err != nil {
+		fmt.Fprintf(os.Stderr, "meteo: failed to create location preferences service: %v\n", err)
+		os.Exit(1)
+	}
+
 	if resolvedOptions.initConfig {
 		err := meteoConfig.WriteConfig(resolvedOptions.configPath, meteoConfig.AppConfig{
 			DefaultCity:    resolvedOptions.city,
@@ -75,7 +81,7 @@ func main() {
 
 	locationResolver := location.NewOpenMeteoResolver(httpClient)
 	locationSearcher := location.NewOpenMeteoSearcher(httpClient)
-	locationnSearchService := app.NewLocationSearchService(locationSearcher)
+	locationSearchService := app.NewLocationSearchService(locationSearcher)
 
 	var forecastProvider app.ForecastProvider
 	if resolvedOptions.fail {
@@ -93,11 +99,12 @@ func main() {
 		},
 	)
 
-	model := tui.NewModelWithSearch(
+	model := tui.NewModelWithSearchAndPreferences(
 		resolvedOptions.city,
 		resolvedOptions.country,
 		weatherService,
-		locationnSearchService,
+		locationSearchService,
+		locationPreferencesService,
 	)
 
 	program := tea.NewProgram(model)

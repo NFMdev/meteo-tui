@@ -17,3 +17,19 @@ type locationSearchLoadedMsg struct {
 type locationSearchFailedMsg struct {
 	err error
 }
+
+type favoritesLoadedMsg struct {
+	favorites []domain.SavedLocation
+}
+
+type favoritesFailedMsg struct {
+	err error
+}
+
+type locationPreferenceUpdatedMsg struct {
+	message string
+}
+
+type locationPreferenceFailedMsg struct {
+	err error
+}

@@ -69,6 +69,25 @@ func (m Model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		m.mode = screenModeSearchResults
 		return m, nil
 
+	case favoritesLoadedMsg:
+		// TODO: store these in model.favorites
+		m.statusMessage = "Favorites loaded."
+		return m, nil
+
+	case favoritesFailedMsg:
+		m.statusMessage = ""
+		m.err = msg.err
+		return m, nil
+
+	case locationPreferenceUpdatedMsg:
+		m.statusMessage = msg.message
+		return m, nil
+
+	case locationPreferenceFailedMsg:
+		m.statusMessage = ""
+		m.err = msg.err
+		return m, nil
+
 	case tea.WindowSizeMsg:
 		m.width = msg.Width
 		m.height = msg.Height
@@ -84,7 +103,7 @@ func (m Model) loadWeatherCmd() tea.Cmd {
 		ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
 		defer cancel()
 
-		report, err := m.loader.GetWeather(ctx, m.city, m.country)
+		report, err := m.weatherLoader.GetWeather(ctx, m.city, m.country)
 		if err != nil {
 			return weatherFailedMsg{err: err}
 		}
