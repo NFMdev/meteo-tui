@@ -3,11 +3,12 @@ package tui
 import "charm.land/bubbles/v2/key"
 
 type KeyMap struct {
-	Up      key.Binding
-	Down    key.Binding
-	Refresh key.Binding
-	Help    key.Binding
-	Quit    key.Binding
+	Up          key.Binding
+	Down        key.Binding
+	Refresh     key.Binding
+	AddFavorite key.Binding
+	Help        key.Binding
+	Quit        key.Binding
 
 	ScrollUp     key.Binding
 	ScrollDown   key.Binding
@@ -33,6 +34,10 @@ func DefaultKeyMap() KeyMap {
 		Refresh: key.NewBinding(
 			key.WithKeys("r"),
 			key.WithHelp("r", "refresh"),
+		),
+		AddFavorite: key.NewBinding(
+			key.WithKeys("a"),
+			key.WithHelp("a", "add favorite"),
 		),
 		Help: key.NewBinding(
 			key.WithKeys("?"),
@@ -78,9 +83,10 @@ func (k KeyMap) ShortHelp() []key.Binding {
 		k.Up,
 		k.Down,
 		k.Search,
-		k.Refresh,
+		k.AddFavorite,
 		k.Quit,
 		k.Help,
+		k.Refresh,
 		k.ScrollUp,
 		k.ScrollDown,
 	}
@@ -100,7 +106,10 @@ func (k KeyMap) FullHelp() [][]key.Binding {
 		},
 		{
 			k.Refresh,
+		},
+		{
 			k.Search,
+			k.AddFavorite,
 		},
 		{
 			k.Help,
