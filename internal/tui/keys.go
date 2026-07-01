@@ -3,12 +3,11 @@ package tui
 import "charm.land/bubbles/v2/key"
 
 type KeyMap struct {
-	Up          key.Binding
-	Down        key.Binding
-	Refresh     key.Binding
-	AddFavorite key.Binding
-	Help        key.Binding
-	Quit        key.Binding
+	Up      key.Binding
+	Down    key.Binding
+	Refresh key.Binding
+	Help    key.Binding
+	Quit    key.Binding
 
 	ScrollUp     key.Binding
 	ScrollDown   key.Binding
@@ -18,6 +17,9 @@ type KeyMap struct {
 	Search key.Binding
 	Cancel key.Binding
 	Submit key.Binding
+
+	AddFavorite key.Binding
+	Favorites   key.Binding
 }
 
 // TODO: Separate single-column keys from multicolumn
@@ -38,6 +40,10 @@ func DefaultKeyMap() KeyMap {
 		AddFavorite: key.NewBinding(
 			key.WithKeys("a"),
 			key.WithHelp("a", "add favorite"),
+		),
+		Favorites: key.NewBinding(
+			key.WithKeys("f"),
+			key.WithHelp("f", "favorites"),
 		),
 		Help: key.NewBinding(
 			key.WithKeys("?"),
@@ -83,9 +89,10 @@ func (k KeyMap) ShortHelp() []key.Binding {
 		k.Up,
 		k.Down,
 		k.Search,
-		k.AddFavorite,
+		k.Favorites,
 		k.Quit,
 		k.Help,
+		k.AddFavorite,
 		k.Refresh,
 		k.ScrollUp,
 		k.ScrollDown,
@@ -106,9 +113,10 @@ func (k KeyMap) FullHelp() [][]key.Binding {
 		},
 		{
 			k.Refresh,
+			k.Search,
 		},
 		{
-			k.Search,
+			k.Favorites,
 			k.AddFavorite,
 		},
 		{

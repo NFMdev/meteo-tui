@@ -46,12 +46,18 @@ type Model struct {
 	spinner     spinner.Model
 	viewport    viewport.Model
 
-	mode                 screenMode
+	mode screenMode
+
 	searchInput          textinput.Model
 	searching            bool
 	searchResults        []domain.LocationSearchResult
 	selectedSearchResult int
 	searchErr            error
+
+	favorites        []domain.SavedLocation
+	favoritesLoading bool
+	selectedFavorite int
+	favoritesErr     error
 
 	statusMessage string
 

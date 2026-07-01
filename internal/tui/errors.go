@@ -8,4 +8,5 @@ var (
 	errSearchResultRequired              = errors.New("search result is required")
 	errLocationPreferencesLoaderRequired = errors.New("location preferences loader is required")
 	errCurrentLocationRequired           = errors.New("current location is required")
+	errFavoriteRequired                  = errors.New("favorite location is required")
 )

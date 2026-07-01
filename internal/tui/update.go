@@ -30,12 +30,15 @@ func (m Model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		case screenModeSearchResults:
 			return m.updateSearchResultKey(msg)
 
+		case screenModeFavorites:
+			return m.updateFavoritesKey(msg)
+
 		default:
 			return m.updateDashboardKey(msg)
 		}
 
 	case spinner.TickMsg:
-		if m.loading || m.searching {
+		if m.loading || m.searching || m.favoritesLoading {
 			var cmd tea.Cmd
 			m.spinner, cmd = m.spinner.Update(msg)
 			return m, cmd
@@ -70,13 +73,19 @@ func (m Model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		return m, nil
 
 	case favoritesLoadedMsg:
-		// TODO: store these in model.favorites
-		m.statusMessage = "Favorites loaded."
+		m.favoritesLoading = false
+		m.favoritesErr = nil
+		m.favorites = msg.favorites
+		m.selectedFavorite = 0
+		m.mode = screenModeFavorites
 		return m, nil
 
 	case favoritesFailedMsg:
-		m.statusMessage = ""
-		m.err = msg.err
+		m.favoritesLoading = false
+		m.favoritesErr = msg.err
+		m.favorites = nil
+		m.selectedFavorite = 0
+		m.mode = screenModeFavorites
 		return m, nil
 
 	case locationPreferenceUpdatedMsg:
