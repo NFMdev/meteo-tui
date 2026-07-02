@@ -1,6 +1,8 @@
 package tui
 
-import "github.com/nfmdev/meteo/internal/domain"
+import (
+	"github.com/nfmdev/meteo/internal/domain"
+)
 
 type weatherLoadedMsg struct {
 	report domain.WeatherReport
@@ -32,4 +34,9 @@ type locationPreferenceUpdatedMsg struct {
 
 type locationPreferenceFailedMsg struct {
 	err error
+}
+
+type favoriteRemovedMsg struct {
+	favorites []domain.SavedLocation
+	message   string
 }

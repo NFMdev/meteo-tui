@@ -18,8 +18,10 @@ type KeyMap struct {
 	Cancel key.Binding
 	Submit key.Binding
 
-	AddFavorite key.Binding
-	Favorites   key.Binding
+	AddFavorite    key.Binding
+	Favorites      key.Binding
+	SetDefault     key.Binding
+	RemoveFavorite key.Binding
 }
 
 // TODO: Separate single-column keys from multicolumn
@@ -44,6 +46,14 @@ func DefaultKeyMap() KeyMap {
 		Favorites: key.NewBinding(
 			key.WithKeys("f"),
 			key.WithHelp("f", "favorites"),
+		),
+		SetDefault: key.NewBinding(
+			key.WithKeys("d"),
+			key.WithHelp("d", "set default"),
+		),
+		RemoveFavorite: key.NewBinding(
+			key.WithKeys("x"),
+			key.WithHelp("x", "remove favorite"),
 		),
 		Help: key.NewBinding(
 			key.WithKeys("?"),
@@ -93,6 +103,7 @@ func (k KeyMap) ShortHelp() []key.Binding {
 		k.Quit,
 		k.Help,
 		k.AddFavorite,
+		k.SetDefault,
 		k.Refresh,
 		k.ScrollUp,
 		k.ScrollDown,
@@ -118,6 +129,9 @@ func (k KeyMap) FullHelp() [][]key.Binding {
 		{
 			k.Favorites,
 			k.AddFavorite,
+		},
+		{
+			k.SetDefault,
 		},
 		{
 			k.Help,

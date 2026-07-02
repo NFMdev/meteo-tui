@@ -92,8 +92,32 @@ func (m Model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		m.statusMessage = msg.message
 		return m, nil
 
+	case favoriteRemovedMsg:
+		m.favoritesLoading = false
+		m.favoritesErr = nil
+		m.favorites = msg.favorites
+		m.statusMessage = msg.message
+
+		if len(m.favorites) == 0 {
+			m.selectedFavorite = 0
+			return m, nil
+		}
+
+		if m.selectedFavorite >= len(m.favorites) {
+			m.selectedFavorite = len(m.favorites) - 1
+		}
+
+		return m, nil
+
 	case locationPreferenceFailedMsg:
 		m.statusMessage = ""
+
+		if m.mode == screenModeFavorites {
+			m.favoritesLoading = false
+			m.favoritesErr = msg.err
+			return m, nil
+		}
+
 		m.err = msg.err
 		return m, nil
 

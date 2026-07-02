@@ -44,7 +44,11 @@ func (m Model) renderFavorites() string {
 		)
 	}
 
-	lines = append(lines, "", "↑/↓ select favorite • Enter ⏎ load weather • Esc back")
+	lines = append(
+		lines,
+		"",
+		"↑/↓ select favorite • Enter ⏎ load weather • d set default • x remove • Esc back",
+	)
 
 	return panelStyle.
 		Width(m.panelWidth()).

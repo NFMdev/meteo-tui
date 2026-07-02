@@ -43,6 +43,30 @@ func (m Model) updateFavoritesKey(msg tea.KeyPressMsg) (Model, tea.Cmd) {
 		m.selectedFavorite = 0
 
 		return m, m.loadWeatherCmd()
+
+	case key.Matches(msg, m.keys.SetDefault):
+		location, ok := m.selectedSavedLocation()
+		if !ok {
+			m.favoritesErr = errFavoriteRequired
+			return m, nil
+		}
+
+		m.statusMessage = ""
+		m.favoritesErr = nil
+		return m, m.setDefaultLocationCmd(location)
+
+	case key.Matches(msg, m.keys.RemoveFavorite):
+		location, ok := m.selectedSavedLocation()
+		if !ok {
+			m.favoritesErr = errFavoriteRequired
+			return m, nil
+		}
+
+		m.statusMessage = ""
+		m.favoritesErr = nil
+		m.favoritesLoading = true
+
+		return m, m.removeFavoriteCmd(location)
 	}
 
 	return m, nil

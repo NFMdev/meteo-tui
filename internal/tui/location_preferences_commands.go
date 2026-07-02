@@ -69,8 +69,16 @@ func (m Model) removeFavoriteCmd(location domain.SavedLocation) tea.Cmd {
 			}
 		}
 
-		return locationPreferenceUpdatedMsg{
-			message: "Favorite removed.",
+		favorites, err := m.locationPreferencesLoader.ListFavorites(context.Background())
+		if err != nil {
+			return favoritesFailedMsg{
+				err: err,
+			}
+		}
+
+		return favoriteRemovedMsg{
+			favorites: favorites,
+			message:   "Favorite removed.",
 		}
 	}
 }
