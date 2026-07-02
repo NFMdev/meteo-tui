@@ -8,6 +8,10 @@ func (m Model) renderFavorites() string {
 		"",
 	}
 
+	if m.statusMessage != "" {
+		lines = append(lines, m.statusMessage, "")
+	}
+
 	if m.favoritesLoading {
 		lines = append(lines, m.spinner.View()+" Loading favorites...")
 		lines = append(lines, "", "Press Esc to return")

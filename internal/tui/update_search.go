@@ -72,6 +72,28 @@ func (m Model) updateSearchResultKey(msg tea.KeyPressMsg) (Model, tea.Cmd) {
 		m.searchInput.Blur()
 
 		return m, m.loadWeatherCmd()
+
+	case key.Matches(msg, m.keys.AddFavorite):
+		location, ok := m.selectedSearchResultSavedLocation()
+		if !ok {
+			m.searchErr = errSearchResultRequired
+			return m, nil
+		}
+
+		m.statusMessage = ""
+		m.searchErr = nil
+		return m, m.addFavoriteCmd(location)
+
+	case key.Matches(msg, m.keys.SetDefault):
+		location, ok := m.selectedSearchResultSavedLocation()
+		if !ok {
+			m.searchErr = errSearchResultRequired
+			return m, nil
+		}
+
+		m.statusMessage = ""
+		m.searchErr = nil
+		return m, m.setDefaultLocationCmd(location)
 	}
-	return m, m.loadWeatherCmd()
+	return m, nil
 }

@@ -112,14 +112,21 @@ func (m Model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 	case locationPreferenceFailedMsg:
 		m.statusMessage = ""
 
-		if m.mode == screenModeFavorites {
+		switch m.mode {
+		case screenModeFavorites:
 			m.favoritesLoading = false
 			m.favoritesErr = msg.err
 			return m, nil
-		}
 
-		m.err = msg.err
-		return m, nil
+		case screenModeSearchResults:
+			m.searching = false
+			m.searchErr = msg.err
+			return m, nil
+
+		default:
+			m.err = msg.err
+			return m, nil
+		}
 
 	case tea.WindowSizeMsg:
 		m.width = msg.Width
