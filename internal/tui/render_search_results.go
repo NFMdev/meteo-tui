@@ -8,6 +8,10 @@ func (m Model) renderSearchResults() string {
 		"",
 	}
 
+	if m.statusMessage != "" {
+		lines = append(lines, m.statusMessage, "")
+	}
+
 	if m.searching {
 		lines = append(lines, m.spinner.View()+" Searching locations...")
 		lines = append(lines, "", "Press Esc to cancel")
@@ -44,7 +48,11 @@ func (m Model) renderSearchResults() string {
 		)
 	}
 
-	lines = append(lines, "", "↑/↓ select result • Enter ⏎ load weather • Esc back")
+	lines = append(
+		lines,
+		"",
+		"↑/↓ select result • Enter ⏎ load weather • a add favorite • d set default • Esc back",
+	)
 	return panelStyle.
 		Width(m.panelWidth()).
 		Render(joinTruncatedLines(lines, m.innerPanelWidth()))

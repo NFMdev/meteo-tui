@@ -17,6 +17,10 @@ func (m Model) render() string {
 
 	case screenModeSearchResults:
 		return m.renderSearchResults()
+
+	case screenModeFavorites:
+		return m.renderFavorites()
+
 	}
 
 	switch {

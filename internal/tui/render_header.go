@@ -29,8 +29,14 @@ func (m Model) renderHeader() string {
 		),
 	)
 
-	return strings.Join([]string{
+	lines := []string{
 		title,
 		metadata,
-	}, "\n")
+	}
+
+	if m.statusMessage != "" {
+		lines = append(lines, subtitleStyle.Render(m.statusMessage))
+	}
+
+	return strings.Join(lines, "\n")
 }

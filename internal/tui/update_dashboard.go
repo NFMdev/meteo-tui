@@ -10,6 +10,30 @@ func (m Model) updateDashboardKey(msg tea.KeyPressMsg) (Model, tea.Cmd) {
 	case key.Matches(msg, m.keys.Search):
 		return m.enterSearchMode()
 
+	case key.Matches(msg, m.keys.Favorites):
+		return m.enterFavoritesMode()
+
+	case key.Matches(msg, m.keys.AddFavorite):
+		location, ok := m.currentSavedLocation()
+		if !ok {
+			m.statusMessage = ""
+			m.err = errCurrentLocationRequired
+			return m, nil
+		}
+
+		m.statusMessage = ""
+		return m, m.addFavoriteCmd(location)
+
+	case key.Matches(msg, m.keys.SetDefault):
+		location, ok := m.currentSavedLocation()
+		if !ok {
+			m.statusMessage = ""
+			return m, m.addFavoriteCmd(location)
+		}
+
+		m.statusMessage = ""
+		return m, m.setDefaultLocationCmd(location)
+
 	case key.Matches(msg, m.keys.Up):
 		m.selectPreviousDay()
 		m.rebuildViewportContent()

@@ -1,5 +1,32 @@
 # Changelog
 
+## v0.6.0
+
+### Added
+- Added saved location model
+- Added conversion from search results to saved locations
+- Added conversion from current weather location to saved location
+- Added favorites to config
+- Added duplicate favorite detection
+- Added location preferences service
+- Added default location setting
+- Added save current location as a favorite
+- Added set current location as default
+- Added favorites screen
+- Added keyboard navigation for favorites
+- Added loading weather from a selected favorite
+- Added set selected favorite as default
+- Added remove selected favorite
+- Added save selected search result as favorite
+- Added set selected search result as default
+
+### Changed
+- Config file can now include a favorites list
+- Existing config files without favorites remain compatible
+- Dashboard help includes favorites and default actions
+- Search results support preference actions
+- TUI support for favorites as a dedicated screen
+
 ## v0.5.0
 
 ### Added
