@@ -38,6 +38,9 @@ go run ./cmd/meteo --city Madrid --country ES
 | ↑ / k | previous day |
 | ↓ / j | next day |
 | s | open location search |
+| f | open favorites screen |
+| a | add current location to favorites |
+| d | set current location as default |
 | u / pgup | scroll up |
 | d / pgdown | scroll down |
 | g / home | scroll top |
@@ -49,6 +52,17 @@ go run ./cmd/meteo --city Madrid --country ES
 | :---: | :---: |
 | ↑ / ↓ | move through location results |
 | Enter ⏎ | search location / load selected location |
+| a | add selected location to favorites |
+| d | set selected location as default |
+| Esc | go back |
+
+### Inside favorites screen
+| Key | Action |
+| :---: | :---: |
+| ↑ / ↓ | move through favorites |
+| Enter ⏎ | load weather for selected favorite |
+| d | set selected favorite as default location |
+| x | remove selected favorite |
 | Esc | go back |
 
 ## Requirements
@@ -57,7 +71,27 @@ go run ./cmd/meteo --city Madrid --country ES
 - Terminal with enough size for the TUI
 
 ## Configuration
-Meteo TUI supports a local configuration file for storing a default location.
+Meteo TUI supports a local configuration file for storing default location and favorite locations.
+
+Default location and favorites are stored in the local config file:
+
+`~/.config/meteo/config.json`
+
+### Location resolution priority
+Location resolution priority
+
+Meteo resolves the final location in this order:
+
+1. CLI flags
+2. Config file
+3. Built-in fallback
+
+The built-in fallback is `Copenhagen, DK`
+
+This means `meteo` will still run even if no config file exists.
+
+### Location search
+Users can search locations from  inside the TUI and load weather reports for selected location, they can update default location and add favorites from here.
 
 ### Initialize config
 ```bash
@@ -123,22 +157,6 @@ You can choose a custom cache directory:
 ```bash
 meteo --city Copenhagen --country DK --cache /tmp/meteo-cache
 ```
-
-## Location resolution priority
-Location resolution priority
-
-Meteo resolves the final location in this order:
-
-1. CLI flags
-2. Config file
-3. Built-in fallback
-
-The built-in fallback is `Copenhagen, DK`
-
-This means `meteo` will still run even if no config file exists.
-
-### Location search
-Users can search locations from  inside the TUI and load weather reports for selected location, this does not update the default config and there is no search history.
 
 ## CLI flags
 | Key | Action |
